@@ -1,4 +1,4 @@
-// database.js - LocalStorage Database Layer for AL FIDA HUSSAIN PUBLIC SCHOOLS
+// database.js - LocalStorage Database Layer for AL Muneer Ahmed Public School
 
 const DB_PREFIX = 'school_';
 
@@ -105,12 +105,12 @@ function saveSettings(settings) {
 
 function getDefaultSettings() {
     return {
-        schoolName: 'AL FIDA HUSSAIN PUBLIC SCHOOLS',
+        schoolName: 'AL Muneer Ahmed Public School',
         tagline: 'Quality Education, Bright Future',
         whatsapp: '03168122916',
         whatsappIntl: '923168122916',
         phone: '03168122916',
-        email: 'info@alfidahussain.edu.pk',
+        email: 'info@almuneerahmed.edu.pk',
         address: 'Pakistan',
         logo: 'assets/logo.png',
         academicSession: '2025-2026',

@@ -187,7 +187,7 @@ function renderStudentWhatsAppTable(containerId, options = {}) {
         students.forEach((s, i) => {
             const statusClass = s.status === 'Active' ? 'badge-success' : 'badge-secondary';
             const waBtn = s.parentWhatsapp 
-                ? WhatsApp.createWhatsAppButton(s.parentWhatsapp, `Assalam-o-Alaikum. This is a message from AL FIDA HUSSAIN PUBLIC SCHOOLS regarding your child ${s.name} (${s.className}-${s.section}).`, 'Chat', 'btn btn-success btn-sm')
+                ? WhatsApp.createWhatsAppButton(s.parentWhatsapp, `Assalam-o-Alaikum. This is a message from AL Muneer Ahmed Public School regarding your child ${s.name} (${s.className}-${s.section}).`, 'Chat', 'btn btn-success btn-sm')
                 : '<span class="badge badge-secondary">N/A</span>';
             
             html += `

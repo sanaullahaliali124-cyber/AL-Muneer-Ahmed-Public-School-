@@ -60,7 +60,7 @@ function renderParentsTable(containerId, options = {}) {
         const children = getParentChildren(p.id);
         const childrenNames = children.map(c => c.name).join(', ') || '-';
         const waBtn = p.whatsapp 
-            ? WhatsApp.createWhatsAppButton(p.whatsapp, `Assalam-o-Alaikum. This is a message from AL FIDA HUSSAIN PUBLIC SCHOOLS.`, 'Chat', 'btn btn-success btn-sm')
+            ? WhatsApp.createWhatsAppButton(p.whatsapp, `Assalam-o-Alaikum. This is a message from AL Muneer Ahmed Public School.`, 'Chat', 'btn btn-success btn-sm')
             : '-';
         
         html += `<tr>

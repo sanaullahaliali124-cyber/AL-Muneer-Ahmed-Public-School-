@@ -96,7 +96,7 @@ function renderAdmissionsTable(containerId, options = {}) {
                     <option value="Enrolled" ${a.status==='Enrolled'?'selected':''}>Enrolled</option>
                 </select>
                 ${a.status === 'Approved' ? `<button class="btn btn-primary btn-sm" onclick="enrollAdmission('${a.id}')">Enroll</button>` : ''}
-                ${a.whatsapp ? WhatsApp.createWhatsAppButton(a.whatsapp, `Assalam-o-Alaikum. Regarding your admission application for ${a.studentName} at AL FIDA HUSSAIN PUBLIC SCHOOLS.`, '', 'btn btn-success btn-sm') : ''}
+                ${a.whatsapp ? WhatsApp.createWhatsAppButton(a.whatsapp, `Assalam-o-Alaikum. Regarding your admission application for ${a.studentName} at AL Muneer Ahmed Public School.`, '', 'btn btn-success btn-sm') : ''}
             </td>
         </tr>`;
     });

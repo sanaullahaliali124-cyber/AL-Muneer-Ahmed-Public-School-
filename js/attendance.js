@@ -135,7 +135,7 @@ function renderAbsentWhatsAppList(containerId, date) {
     
     absents.forEach((item, i) => {
         const s = item.student;
-        const msg = `Assalam-o-Alaikum. This is to inform you that your child ${s.name} (${s.className}-${s.section}) was marked ABSENT today (${date}) at AL FIDA HUSSAIN PUBLIC SCHOOLS. Please contact the school if needed.`;
+        const msg = `Assalam-o-Alaikum. This is to inform you that your child ${s.name} (${s.className}-${s.section}) was marked ABSENT today (${date}) at AL Muneer Ahmed Public School. Please contact the school if needed.`;
         html += `<tr>
             <td>${i + 1}</td>
             <td><strong>${App.escapeHtml(s.name)}</strong></td>

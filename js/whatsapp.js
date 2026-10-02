@@ -36,7 +36,7 @@ function getSchoolWhatsApp() {
 }
 
 function openSchoolWhatsApp(message = '') {
-    const defaultMsg = message || `Assalam-o-Alaikum. I would like to inquire about AL FIDA HUSSAIN PUBLIC SCHOOLS.`;
+    const defaultMsg = message || `Assalam-o-Alaikum. I would like to inquire about AL Muneer Ahmed Public School.`;
     openWhatsApp(getSchoolWhatsApp(), defaultMsg);
 }
 
@@ -45,7 +45,7 @@ function openParentWhatsApp(student, customMessage = '') {
         showToast('No WhatsApp number available for this parent', 'error');
         return;
     }
-    const msg = customMessage || `Assalam-o-Alaikum. This is a message from AL FIDA HUSSAIN PUBLIC SCHOOLS regarding your child ${student.name} (${student.className} - ${student.section}).`;
+    const msg = customMessage || `Assalam-o-Alaikum. This is a message from AL Muneer Ahmed Public School regarding your child ${student.name} (${student.className} - ${student.section}).`;
     openWhatsApp(student.parentWhatsapp, msg);
 }
 
@@ -54,7 +54,7 @@ function openTeacherWhatsApp(teacher, customMessage = '') {
         showToast('No WhatsApp number available', 'error');
         return;
     }
-    const msg = customMessage || `Assalam-o-Alaikum. This is a message from AL FIDA HUSSAIN PUBLIC SCHOOLS.`;
+    const msg = customMessage || `Assalam-o-Alaikum. This is a message from AL Muneer Ahmed Public School.`;
     openWhatsApp(teacher.whatsapp, msg);
 }
 
