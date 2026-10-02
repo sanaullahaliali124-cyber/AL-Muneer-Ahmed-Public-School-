@@ -1,8 +1,8 @@
-# AL FIDA HUSSAIN PUBLIC SCHOOLS - School Management System
+# AL Muneer Ahmed Public School - School Management System
 
 A complete, professional School Management System built with **HTML5, CSS3, and Vanilla JavaScript**. Uses LocalStorage for data persistence. No backend required.
 
-**School:** AL FIDA HUSSAIN PUBLIC SCHOOLS  
+**School:** AL Muneer Ahmed Public School  
 **Tagline:** Quality Education, Bright Future  
 **WhatsApp:** 03168122916 (International: 923168122916)
 
@@ -117,7 +117,7 @@ assets/logo.png
 ```
 
 Recommended size: 200x200 px (PNG with transparent background).  
-If the file is missing, a fallback "AFH" badge is shown automatically.
+If the file is missing, a fallback "AMA" badge is shown automatically.
 
 ---
 
@@ -184,5 +184,5 @@ Requires JavaScript and LocalStorage enabled.
 
 ## License
 
-Demo system for AL FIDA HUSSAIN PUBLIC SCHOOLS.  
+Demo system for AL Muneer Ahmed Public School.  
 Built with HTML, CSS & Vanilla JavaScript.
