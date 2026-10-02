@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="dashboard-body">
+    <div class="sidebar-overlay" onclick="App.toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="assets/logo.png" alt="Logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230a2540%22 width=%22100%22 height=%22100%22 rx=%2250%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23d4a017%22 font-size=%2230%22 font-family=%22Arial%22 font-weight=%22bold%22>AFH</text></svg>'">
+            <div><h2>AL FIDA HUSSAIN</h2><span>Public Schools</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">Main</div>
+            <a href="#" class="active" data-section="dashboard" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#" data-section="students" onclick="showSection('students')"><i class="fas fa-user-graduate"></i> Students</a>
+            <a href="#" data-section="parents" onclick="showSection('parents')"><i class="fas fa-users"></i> Parents</a>
+            <a href="#" data-section="teachers" onclick="showSection('teachers')"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+            <a href="#" data-section="classes" onclick="showSection('classes')"><i class="fas fa-school"></i> Classes</a>
+            <div class="nav-section">Academic</div>
+            <a href="#" data-section="attendance" onclick="showSection('attendance')"><i class="fas fa-calendar-check"></i> Attendance</a>
+            <a href="#" data-section="fees" onclick="showSection('fees')"><i class="fas fa-money-bill-wave"></i> Fees</a>
+            <a href="#" data-section="exams" onclick="showSection('exams')"><i class="fas fa-file-alt"></i> Exams</a>
+            <a href="#" data-section="results" onclick="showSection('results')"><i class="fas fa-chart-bar"></i> Results</a>
+            <a href="#" data-section="timetable" onclick="showSection('timetable')"><i class="fas fa-clock"></i> Timetable</a>
+            <a href="#" data-section="homework" onclick="showSection('homework')"><i class="fas fa-book-open"></i> Homework</a>
+            <div class="nav-section">Communication</div>
+            <a href="#" data-section="whatsapp" onclick="showSection('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp Contacts</a>
+            <a href="#" data-section="defaulters" onclick="showSection('defaulters')"><i class="fas fa-exclamation-triangle"></i> Fee Defaulters</a>
+            <a href="#" data-section="absent-wa" onclick="showSection('absent-wa')"><i class="fas fa-user-times"></i> Absent WhatsApp</a>
+            <a href="#" data-section="notices" onclick="showSection('notices')"><i class="fas fa-bullhorn"></i> Notices</a>
+            <a href="#" data-section="events" onclick="showSection('events')"><i class="fas fa-calendar-alt"></i> Events</a>
+            <div class="nav-section">Management</div>
+            <a href="#" data-section="admissions" onclick="showSection('admissions')"><i class="fas fa-user-plus"></i> Admissions</a>
+            <a href="#" data-section="library" onclick="showSection('library')"><i class="fas fa-book"></i> Library</a>
+            <a href="#" data-section="transport" onclick="showSection('transport')"><i class="fas fa-bus"></i> Transport</a>
+            <a href="#" data-section="payroll" onclick="showSection('payroll')"><i class="fas fa-wallet"></i> Payroll</a>
+            <a href="#" data-section="idcards" onclick="showSection('idcards')"><i class="fas fa-id-card"></i> ID Cards</a>
+            <a href="#" data-section="certificates" onclick="showSection('certificates')"><i class="fas fa-certificate"></i> Certificates</a>
+            <a href="#" data-section="reports" onclick="showSection('reports')"><i class="fas fa-file-export"></i> Reports</a>
+            <a href="#" data-section="notifications" onclick="showSection('notifications')"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#" data-section="settings" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div><div class="user-name">Admin</div><div class="user-role">Super Admin</div></div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="App.toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h1 id="page-title">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Search students, teachers..." oninput="doGlobalSearch(this.value)">
+                </div>
+                <button class="topbar-btn" onclick="App.toggleTheme()" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+                <button class="topbar-btn" onclick="showSection('notifications')" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge notification-badge">0</span>
+                </button>
+                <a href="https://wa.me/923168122916" target="_blank" class="topbar-btn" title="School WhatsApp" style="color:#25d366;"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- DASHBOARD -->
+            <div id="section-dashboard" class="content-section">
+                <div class="stats-grid" id="stats-grid"></div>
+                <div class="grid-2">
+                    <div class="panel">
+                        <div class="panel-header"><h2>Student by Class</h2></div>
+                        <div class="panel-body"><div class="chart-container" id="chart-students"></div></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Today's Attendance</h2></div>
+                        <div class="panel-body"><div class="chart-container" id="chart-attendance"></div></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header"><h2>Recent Notifications</h2></div>
+                    <div class="panel-body" id="dash-notifications"></div>
+                </div>
+            </div>
+
+            <!-- STUDENTS -->
+            <div id="section-students" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Students Management</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddStudentModal()"><i class="fas fa-plus"></i> Add Student</button>
+                            <button class="btn btn-secondary btn-sm" onclick="Students.exportStudentsCSV()"><i class="fas fa-download"></i> Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <input type="text" id="student-search" placeholder="Search students..." oninput="loadStudents()">
+                            <select id="student-class-filter" onchange="loadStudents()"><option value="">All Classes</option></select>
+                            <select id="student-status-filter" onchange="loadStudents()">
+                                <option value="">All Status</option><option value="Active">Active</option><option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div id="students-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARENTS -->
+            <div id="section-parents" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Parents Management</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddParentModal()"><i class="fas fa-plus"></i> Add Parent</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="filters-bar"><input type="text" id="parent-search" placeholder="Search parents..." oninput="loadParents()"></div>
+                        <div id="parents-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEACHERS -->
+            <div id="section-teachers" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Teachers Management</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddTeacherModal()"><i class="fas fa-plus"></i> Add Teacher</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="filters-bar"><input type="text" id="teacher-search" placeholder="Search teachers..." oninput="loadTeachers()"></div>
+                        <div id="teachers-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLASSES -->
+            <div id="section-classes" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Classes & Sections</h2></div>
+                    <div class="panel-body" id="classes-list"></div>
+                </div>
+            </div>
+
+            <!-- ATTENDANCE -->
+            <div id="section-attendance" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Mark Attendance</h2></div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <input type="date" id="att-date" onchange="loadAttendanceSheet()">
+                            <select id="att-class" onchange="loadAttendanceSheet()"></select>
+                            <select id="att-section" onchange="loadAttendanceSheet()">
+                                <option value="A">A</option><option value="B">B</option>
+                            </select>
+                        </div>
+                        <div id="attendance-sheet"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FEES -->
+            <div id="section-fees" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Fee Management</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddFeeModal()"><i class="fas fa-plus"></i> Add Payment</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <input type="text" id="fee-search" placeholder="Search..." oninput="loadFees()">
+                            <select id="fee-status-filter" onchange="loadFees()">
+                                <option value="">All</option><option value="Paid">Paid</option><option value="Partial">Partial</option><option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        <div id="fees-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXAMS -->
+            <div id="section-exams" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Exams</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddExamModal()"><i class="fas fa-plus"></i> Add Exam</button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="exams-table"></div>
+                </div>
+            </div>
+
+            <!-- RESULTS -->
+            <div id="section-results" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Results & Marks</h2></div>
+                    <div class="panel-body" id="results-table"></div>
+                </div>
+            </div>
+
+            <!-- TIMETABLE -->
+            <div id="section-timetable" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Timetable</h2></div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <select id="tt-class" onchange="loadTimetable()"></select>
+                            <select id="tt-section" onchange="loadTimetable()"><option value="A">A</option><option value="B">B</option></select>
+                        </div>
+                        <div id="timetable-view"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOMEWORK -->
+            <div id="section-homework" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Homework</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddHomeworkModal()"><i class="fas fa-plus"></i> Add Homework</button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="homework-list"></div>
+                </div>
+            </div>
+
+            <!-- WHATSAPP CONTACTS -->
+            <div id="section-whatsapp" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Student WhatsApp Contacts</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-secondary btn-sm" onclick="Reports.generateReport('whatsapp')"><i class="fas fa-download"></i> Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <input type="text" id="wa-search" placeholder="Search..." oninput="loadWhatsAppContacts()">
+                            <select id="wa-class-filter" onchange="loadWhatsAppContacts()"><option value="">All Classes</option></select>
+                        </div>
+                        <div id="whatsapp-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FEE DEFAULTERS -->
+            <div id="section-defaulters" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Fee Defaulters - WhatsApp Reminders</h2></div>
+                    <div class="panel-body" id="defaulters-table"></div>
+                </div>
+            </div>
+
+            <!-- ABSENT WHATSAPP -->
+            <div id="section-absent-wa" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Absent Students WhatsApp List</h2></div>
+                    <div class="panel-body">
+                        <div class="filters-bar"><input type="date" id="absent-date" onchange="loadAbsentWA()"></div>
+                        <div id="absent-wa-table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTICES -->
+            <div id="section-notices" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Notices</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openAddNoticeModal()"><i class="fas fa-plus"></i> Add Notice</button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="notices-list"></div>
+                </div>
+            </div>
+
+            <!-- EVENTS -->
+            <div id="section-events" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Events</h2></div>
+                    <div class="panel-body" id="events-list"></div>
+                </div>
+            </div>
+
+            <!-- ADMISSIONS -->
+            <div id="section-admissions" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Admission Applications</h2></div>
+                    <div class="panel-body" id="admissions-table"></div>
+                </div>
+            </div>
+
+            <!-- LIBRARY -->
+            <div id="section-library" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Library</h2></div>
+                    <div class="panel-body" id="library-list"></div>
+                </div>
+            </div>
+
+            <!-- TRANSPORT -->
+            <div id="section-transport" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Transport</h2></div>
+                    <div class="panel-body" id="transport-list"></div>
+                </div>
+            </div>
+
+            <!-- PAYROLL -->
+            <div id="section-payroll" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Payroll</h2></div>
+                    <div class="panel-body" id="payroll-list"></div>
+                </div>
+            </div>
+
+            <!-- ID CARDS -->
+            <div id="section-idcards" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>ID Card Generator</h2></div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <select id="idcard-student"><option value="">Select Student</option></select>
+                            <button class="btn btn-primary btn-sm" onclick="generateIDCard()"><i class="fas fa-id-card"></i> Generate</button>
+                            <button class="btn btn-secondary btn-sm" onclick="App.printElement('idcard-preview','ID Card')"><i class="fas fa-print"></i> Print</button>
+                        </div>
+                        <div id="idcard-preview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CERTIFICATES -->
+            <div id="section-certificates" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Certificate Generator</h2></div>
+                    <div class="panel-body">
+                        <div class="filters-bar">
+                            <select id="cert-type">
+                                <option value="character">Character Certificate</option>
+                                <option value="leaving">School Leaving Certificate</option>
+                                <option value="achievement">Achievement Certificate</option>
+                                <option value="participation">Participation Certificate</option>
+                            </select>
+                            <select id="cert-student"><option value="">Select Student</option></select>
+                            <button class="btn btn-primary btn-sm" onclick="generateCertificate()"><i class="fas fa-certificate"></i> Generate</button>
+                            <button class="btn btn-secondary btn-sm" onclick="App.printElement('cert-preview','Certificate')"><i class="fas fa-print"></i> Print</button>
+                        </div>
+                        <div id="cert-preview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTS -->
+            <div id="section-reports" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Reports & Export</h2></div>
+                    <div class="panel-body">
+                        <div class="cards-grid">
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('students')"><div class="icon"><i class="fas fa-user-graduate"></i></div><h3>Students Report</h3><p>Export all students to CSV</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('teachers')"><div class="icon"><i class="fas fa-chalkboard-teacher"></i></div><h3>Teachers Report</h3><p>Export teachers to CSV</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('fees')"><div class="icon"><i class="fas fa-money-bill"></i></div><h3>Fees Report</h3><p>Export fee records to CSV</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('defaulters')"><div class="icon"><i class="fas fa-exclamation"></i></div><h3>Defaulters Report</h3><p>Export fee defaulters</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('attendance')"><div class="icon"><i class="fas fa-calendar"></i></div><h3>Attendance Report</h3><p>Export attendance data</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('whatsapp')"><div class="icon"><i class="fab fa-whatsapp"></i></div><h3>WhatsApp Contacts</h3><p>Export contact list</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('results')"><div class="icon"><i class="fas fa-chart-bar"></i></div><h3>Results Report</h3><p>Export results to CSV</p></div>
+                            <div class="card" style="cursor:pointer;" onclick="Reports.generateReport('admissions')"><div class="icon"><i class="fas fa-user-plus"></i></div><h3>Admissions Report</h3><p>Export admissions data</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTIFICATIONS -->
+            <div id="section-notifications" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Notifications</h2>
+                        <div class="panel-actions">
+                            <button class="btn btn-secondary btn-sm" onclick="Notifications.markAllAsRead();loadNotifications();"><i class="fas fa-check-double"></i> Mark All Read</button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="notifications-list"></div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div id="section-settings" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>School Settings</h2></div>
+                    <div class="panel-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>School Name</label><input type="text" id="setting-schoolName"></div>
+                            <div class="form-group"><label>Tagline</label><input type="text" id="setting-tagline"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>WhatsApp</label><input type="text" id="setting-whatsapp"></div>
+                            <div class="form-group"><label>Phone</label><input type="text" id="setting-phone"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Email</label><input type="email" id="setting-email"></div>
+                            <div class="form-group"><label>Academic Session</label><input type="text" id="setting-academicSession"></div>
+                        </div>
+                        <div class="form-group"><label>Address</label><input type="text" id="setting-address"></div>
+                        <div style="margin-top:20px;display:flex;gap:10px;">
+                            <button class="btn btn-primary" onclick="Settings.saveSettingsForm()"><i class="fas fa-save"></i> Save Settings</button>
+                            <button class="btn btn-danger" onclick="Settings.resetDemoData()"><i class="fas fa-trash-restore"></i> Reset Demo Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Search Results -->
+            <div id="section-search" class="content-section" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header"><h2>Search Results</h2></div>
+                    <div class="panel-body" id="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal" id="student-modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header"><h2 id="student-modal-title">Add Student</h2><button class="modal-close" onclick="App.closeModal('student-modal')">&times;</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="student-edit-id">
+                <div class="form-row">
+                    <div class="form-group"><label>Student Name *</label><input type="text" id="s-name" required></div>
+                    <div class="form-group"><label>Father Name *</label><input type="text" id="s-father" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Mother Name</label><input type="text" id="s-mother"></div>
+                    <div class="form-group"><label>Date of Birth</label><input type="date" id="s-dob"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Gender</label><select id="s-gender"><option>Male</option><option>Female</option></select></div>
+                    <div class="form-group"><label>Class</label><select id="s-class"></select></div>
+                    <div class="form-group"><label>Section</label><select id="s-section"><option>A</option><option>B</option></select></div>
+                    <div class="form-group"><label>Roll No</label><input type="text" id="s-roll"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Phone</label><input type="text" id="s-phone"></div>
+                    <div class="form-group"><label>Parent WhatsApp</label><input type="text" id="s-whatsapp"></div>
+                </div>
+                <div class="form-group"><label>Address</label><textarea id="s-address"></textarea></div>
+                <div class="form-group"><label>Previous School</label><input type="text" id="s-previous"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal('student-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveStudent()"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fee Receipt Modal -->
+    <div class="modal" id="receipt-modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header"><h2>Fee Receipt</h2><button class="modal-close" onclick="App.closeModal('receipt-modal')">&times;</button></div>
+            <div class="modal-body" id="receipt-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal('receipt-modal')">Close</button>
+                <button class="btn btn-primary" onclick="App.printElement('receipt-content','Fee Receipt')"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/whatsapp.js"></script>
+    <script src="js/students.js"></script>
+    <script src="js/teachers.js"></script>
+    <script src="js/parents.js"></script>
+    <script src="js/attendance.js"></script>
+    <script src="js/fees.js"></script>
+    <script src="js/exams.js"></script>
+    <script src="js/results.js"></script>
+    <script src="js/timetable.js"></script>
+    <script src="js/homework.js"></script>
+    <script src="js/admissions.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/reports.js"></script>
+    <script>
+        Auth.protectPage(['admin']);
+
+        function showSection(name) {
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            const section = document.getElementById('section-' + name);
+            if (section) section.style.display = 'block';
+            const link = document.querySelector(`.sidebar-nav a[data-section="${name}"]`);
+            if (link) link.classList.add('active');
+            const titles = {dashboard:'Dashboard',students:'Students',parents:'Parents',teachers:'Teachers',classes:'Classes',attendance:'Attendance',fees:'Fees',exams:'Exams',results:'Results',timetable:'Timetable',homework:'Homework',whatsapp:'WhatsApp Contacts',defaulters:'Fee Defaulters',absent:'Absent WhatsApp','absent-wa':'Absent WhatsApp',notices:'Notices',events:'Events',admissions:'Admissions',library:'Library',transport:'Transport',payroll:'Payroll',idcards:'ID Cards',certificates:'Certificates',reports:'Reports',notifications:'Notifications',settings:'Settings',search:'Search Results'};
+            document.getElementById('page-title').textContent = titles[name] || name;
+            
+            // Load section data
+            if (name === 'dashboard') loadDashboard();
+            else if (name === 'students') loadStudents();
+            else if (name === 'parents') loadParents();
+            else if (name === 'teachers') loadTeachers();
+            else if (name === 'classes') loadClasses();
+            else if (name === 'attendance') { initAttendanceFilters(); loadAttendanceSheet(); }
+            else if (name === 'fees') loadFees();
+            else if (name === 'exams') Exams.renderExamsTable('exams-table');
+            else if (name === 'results') Results.renderResultsTable('results-table');
+            else if (name === 'timetable') { initTTFilters(); loadTimetable(); }
+            else if (name === 'homework') Homework.renderHomeworkList('homework-list');
+            else if (name === 'whatsapp') loadWhatsAppContacts();
+            else if (name === 'defaulters') Fees.renderFeeDefaultersTable('defaulters-table');
+            else if (name === 'absent-wa') { document.getElementById('absent-date').value = new Date().toISOString().split('T')[0]; loadAbsentWA(); }
+            else if (name === 'notices') loadNotices();
+            else if (name === 'events') loadEvents();
+            else if (name === 'admissions') Admissions.renderAdmissionsTable('admissions-table');
+            else if (name === 'library') loadLibrary();
+            else if (name === 'transport') loadTransport();
+            else if (name === 'payroll') loadPayroll();
+            else if (name === 'idcards') initIDCardSelect();
+            else if (name === 'certificates') initCertSelect();
+            else if (name === 'notifications') loadNotifications();
+            else if (name === 'settings') Settings.loadSettingsForm();
+        }
+
+        function loadDashboard() {
+            const stats = App.getDashboardStats();
+            document.getElementById('stats-grid').innerHTML = `
+                <div class="stat-box"><div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div><div class="stat-info"><h3>${stats.totalStudents}</h3><p>Total Students</p></div></div>
+                <div class="stat-box"><div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div><div class="stat-info"><h3>${stats.totalTeachers}</h3><p>Total Teachers</p></div></div>
+                <div class="stat-box"><div class="stat-icon purple"><i class="fas fa-users"></i></div><div class="stat-info"><h3>${stats.totalParents}</h3><p>Total Parents</p></div></div>
+                <div class="stat-box"><div class="stat-icon teal"><i class="fas fa-school"></i></div><div class="stat-info"><h3>${stats.totalClasses}</h3><p>Total Classes</p></div></div>
+                <div class="stat-box"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3>${stats.todayPresent}</h3><p>Today Present</p></div></div>
+                <div class="stat-box"><div class="stat-icon red"><i class="fas fa-times-circle"></i></div><div class="stat-info"><h3>${stats.todayAbsent}</h3><p>Today Absent</p></div></div>
+                <div class="stat-box"><div class="stat-icon orange"><i class="fas fa-money-bill"></i></div><div class="stat-info"><h3>${stats.pendingFees}</h3><p>Pending Fees</p></div></div>
+                <div class="stat-box"><div class="stat-icon gold"><i class="fas fa-coins"></i></div><div class="stat-info"><h3>${App.formatCurrency(stats.todayCollection)}</h3><p>Today Collection</p></div></div>
+                <div class="stat-box"><div class="stat-icon navy"><i class="fas fa-user-plus"></i></div><div class="stat-info"><h3>${stats.newAdmissions}</h3><p>New Admissions</p></div></div>
+            `;
+            
+            // Simple bar chart for students by class
+            const students = Students.getStudents();
+            const classCounts = {};
+            students.forEach(s => { classCounts[s.className] = (classCounts[s.className] || 0) + 1; });
+            const maxC = Math.max(...Object.values(classCounts), 1);
+            document.getElementById('chart-students').innerHTML = Object.entries(classCounts).slice(0, 8).map(([name, count]) => 
+                `<div class="chart-bar" style="height:${(count/maxC)*200}px"><span class="bar-value">${count}</span><span class="bar-label">${name.replace('Class ','C')}</span></div>`
+            ).join('');
+            
+            // Attendance chart
+            document.getElementById('chart-attendance').innerHTML = `
+                <div class="chart-bar" style="height:${stats.todayPresent > 0 ? 180 : 10}px;background:linear-gradient(to top,#10b981,#34d399)"><span class="bar-value">${stats.todayPresent}</span><span class="bar-label">Present</span></div>
+                <div class="chart-bar" style="height:${stats.todayAbsent > 0 ? (stats.todayAbsent/Math.max(stats.todayPresent,1))*180 : 10}px;background:linear-gradient(to top,#ef4444,#f87171)"><span class="bar-value">${stats.todayAbsent}</span><span class="bar-label">Absent</span></div>
+            `;
+            
+            Notifications.renderNotifications('dash-notifications');
+            Notifications.updateNotificationBadge();
+        }
+
+        function loadStudents() {
+            const search = document.getElementById('student-search')?.value || '';
+            const className = document.getElementById('student-class-filter')?.value || '';
+            const status = document.getElementById('student-status-filter')?.value || '';
+            Students.renderStudentsTable('students-table', { search, filters: { className, status } });
+        }
+        function loadParents() { Parents.renderParentsTable('parents-table', { search: document.getElementById('parent-search')?.value }); }
+        function loadTeachers() { Teachers.renderTeachersTable('teachers-table', { search: document.getElementById('teacher-search')?.value }); }
+        function loadFees() { Fees.renderFeesTable('fees-table', { search: document.getElementById('fee-search')?.value, filters: { status: document.getElementById('fee-status-filter')?.value } }); }
+        function loadWhatsAppContacts() {
+            const search = document.getElementById('wa-search')?.value || '';
+            const className = document.getElementById('wa-class-filter')?.value || '';
+            Students.renderStudentWhatsAppTable('whatsapp-table', { search, filters: { className } });
+        }
+        function loadAbsentWA() { Attendance.renderAbsentWhatsAppList('absent-wa-table', document.getElementById('absent-date').value); }
+        function loadNotifications() { Notifications.renderNotifications('notifications-list'); Notifications.updateNotificationBadge(); }
+
+        function loadClasses() {
+            const classes = DB.getRecords(DB.keys.classes);
+            document.getElementById('classes-list').innerHTML = `<div class="table-responsive"><table class="data-table"><thead><tr><th>#</th><th>Class</th><th>Sections</th><th>Students</th></tr></thead><tbody>
+                ${classes.map((c,i) => {
+                    const count = Students.getStudents().filter(s => s.className === c.name).length;
+                    return `<tr><td>${i+1}</td><td><strong>${c.name}</strong></td><td>${(c.sections||[]).join(', ')}</td><td>${count}</td></tr>`;
+                }).join('')}
+            </tbody></table></div>`;
+        }
+
+        function initAttendanceFilters() {
+            const dateEl = document.getElementById('att-date');
+            if (!dateEl.value) dateEl.value = new Date().toISOString().split('T')[0];
+            const classSel = document.getElementById('att-class');
+            if (classSel.options.length <= 1) {
+                DB.getRecords(DB.keys.classes).forEach(c => {
+                    classSel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+                });
+            }
+        }
+        function loadAttendanceSheet() {
+            const date = document.getElementById('att-date').value;
+            const cls = document.getElementById('att-class').value;
+            const sec = document.getElementById('att-section').value;
+            if (cls) Attendance.renderAttendanceSheet('attendance-sheet', cls, sec, date);
+        }
+
+        function initTTFilters() {
+            const sel = document.getElementById('tt-class');
+            if (sel.options.length === 0) {
+                DB.getRecords(DB.keys.classes).forEach(c => { sel.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
+            }
+        }
+        function loadTimetable() {
+            Timetable.renderTimetable('timetable-view', document.getElementById('tt-class').value, document.getElementById('tt-section').value);
+        }
+
+        function loadNotices() {
+            const notices = DB.getRecords(DB.keys.notices);
+            document.getElementById('notices-list').innerHTML = notices.map(n => `
+                <div class="panel" style="margin-bottom:10px;"><div class="panel-body">
+                    <span class="badge badge-info">${n.category}</span>
+                    <h3 style="margin:8px 0 5px;">${App.escapeHtml(n.title)}</h3>
+                    <p>${App.escapeHtml(n.content)}</p>
+                    <small style="color:var(--text-secondary);">${App.formatDate(n.date)}</small>
+                </div></div>
+            `).join('') || '<div class="empty-state"><h3>No Notices</h3></div>';
+        }
+
+        function loadEvents() {
+            const events = DB.getRecords(DB.keys.events);
+            document.getElementById('events-list').innerHTML = events.map(e => `
+                <div class="panel" style="margin-bottom:10px;"><div class="panel-body">
+                    <h3>${App.escapeHtml(e.title)}</h3>
+                    <p>${App.escapeHtml(e.description)}</p>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">
+                        <i class="fas fa-calendar"></i> ${e.date} | <i class="fas fa-clock"></i> ${e.time} | <i class="fas fa-map-marker-alt"></i> ${e.location}
+                    </p>
+                </div></div>
+            `).join('') || '<div class="empty-state"><h3>No Events</h3></div>';
+        }
+
+        function loadLibrary() {
+            const books = DB.getRecords(DB.keys.books);
+            document.getElementById('library-list').innerHTML = `<div class="table-responsive"><table class="data-table"><thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Qty</th><th>Available</th><th>Status</th></tr></thead><tbody>
+                ${books.map(b => `<tr><td>${b.title}</td><td>${b.author}</td><td>${b.category}</td><td>${b.quantity}</td><td>${b.available}</td><td><span class="badge badge-success">${b.status}</span></td></tr>`).join('')}
+            </tbody></table></div>`;
+        }
+
+        function loadTransport() {
+            const t = DB.loadData(DB.keys.transport, {vehicles:[],routes:[]});
+            document.getElementById('transport-list').innerHTML = `
+                <h3 style="margin-bottom:15px;">Vehicles</h3>
+                <div class="table-responsive"><table class="data-table"><thead><tr><th>Number</th><th>Type</th><th>Capacity</th><th>Driver</th><th>Route</th></tr></thead><tbody>
+                    ${(t.vehicles||[]).map(v => `<tr><td>${v.number}</td><td>${v.type}</td><td>${v.capacity}</td><td>${v.driver}</td><td>${v.route}</td></tr>`).join('')}
+                </tbody></table></div>
+                <h3 style="margin:20px 0 15px;">Routes</h3>
+                <div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>Stops</th><th>Fee</th></tr></thead><tbody>
+                    ${(t.routes||[]).map(r => `<tr><td>${r.name}</td><td>${(r.stops||[]).join(', ')}</td><td>${App.formatCurrency(r.fee)}</td></tr>`).join('')}
+                </tbody></table></div>`;
+        }
+
+        function loadPayroll() {
+            const payroll = DB.getRecords(DB.keys.payroll);
+            document.getElementById('payroll-list').innerHTML = `<div class="table-responsive"><table class="data-table"><thead><tr><th>Teacher</th><th>Month</th><th>Basic</th><th>Net</th><th>Status</th></tr></thead><tbody>
+                ${payroll.map(p => `<tr><td>${p.teacherName}</td><td>${p.month}</td><td>${App.formatCurrency(p.basicSalary)}</td><td>${App.formatCurrency(p.netSalary)}</td><td><span class="badge badge-success">${p.status}</span></td></tr>`).join('')}
+            </tbody></table></div>`;
+        }
+
+        // Student CRUD
+        function openAddStudentModal() {
+            document.getElementById('student-modal-title').textContent = 'Add Student';
+            document.getElementById('student-edit-id').value = '';
+            ['s-name','s-father','s-mother','s-dob','s-roll','s-phone','s-whatsapp','s-address','s-previous'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+            const classSel = document.getElementById('s-class');
+            classSel.innerHTML = DB.getRecords(DB.keys.classes).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            App.openModal('student-modal');
+        }
+        function saveStudent() {
+            const id = document.getElementById('student-edit-id').value;
+            const data = {
+                name: document.getElementById('s-name').value,
+                fatherName: document.getElementById('s-father').value,
+                motherName: document.getElementById('s-mother').value,
+                dob: document.getElementById('s-dob').value,
+                gender: document.getElementById('s-gender').value,
+                className: document.getElementById('s-class').value,
+                section: document.getElementById('s-section').value,
+                rollNo: document.getElementById('s-roll').value,
+                phone: document.getElementById('s-phone').value,
+                parentWhatsapp: document.getElementById('s-whatsapp').value,
+                address: document.getElementById('s-address').value,
+                previousSchool: document.getElementById('s-previous').value,
+                status: 'Active'
+            };
+            if (!data.name || !data.fatherName) { App.showToast('Name and Father Name required', 'error'); return; }
+            if (id) { Students.updateStudent(id, data); App.showToast('Student updated', 'success'); }
+            else { Students.addStudent(data); App.showToast('Student added', 'success'); }
+            App.closeModal('student-modal');
+            loadStudents();
+        }
+        function editStudent(id) {
+            const s = Students.getStudentById(id);
+            if (!s) return;
+            document.getElementById('student-modal-title').textContent = 'Edit Student';
+            document.getElementById('student-edit-id').value = id;
+            document.getElementById('s-name').value = s.name || '';
+            document.getElementById('s-father').value = s.fatherName || '';
+            document.getElementById('s-mother').value = s.motherName || '';
+            document.getElementById('s-dob').value = s.dob || '';
+            document.getElementById('s-gender').value = s.gender || 'Male';
+            const classSel = document.getElementById('s-class');
+            classSel.innerHTML = DB.getRecords(DB.keys.classes).map(c => `<option value="${c.name}" ${c.name===s.className?'selected':''}>${c.name}</option>`).join('');
+            document.getElementById('s-section').value = s.section || 'A';
+            document.getElementById('s-roll').value = s.rollNo || '';
+            document.getElementById('s-phone').value = s.phone || '';
+            document.getElementById('s-whatsapp').value = s.parentWhatsapp || '';
+            document.getElementById('s-address').value = s.address || '';
+            document.getElementById('s-previous').value = s.previousSchool || '';
+            App.openModal('student-modal');
+        }
+        function viewStudent(id) { editStudent(id); }
+        function confirmDeleteStudent(id) {
+            App.confirmDialog('Delete this student?', () => { Students.deleteStudent(id); App.showToast('Student deleted', 'success'); loadStudents(); });
+        }
+        function confirmDeleteTeacher(id) {
+            App.confirmDialog('Delete this teacher?', () => { Teachers.deleteTeacher(id); App.showToast('Deleted', 'success'); loadTeachers(); });
+        }
+        function confirmDeleteParent(id) {
+            App.confirmDialog('Delete this parent?', () => { Parents.deleteParent(id); App.showToast('Deleted', 'success'); loadParents(); });
+        }
+        function confirmDeleteFee(id) {
+            App.confirmDialog('Delete this fee record?', () => { Fees.deleteFee(id); App.showToast('Deleted', 'success'); loadFees(); });
+        }
+        function confirmDeleteExam(id) {
+            App.confirmDialog('Delete this exam?', () => { Exams.deleteExam(id); App.showToast('Deleted', 'success'); Exams.renderExamsTable('exams-table'); });
+        }
+        function confirmDeleteHomework(id) {
+            App.confirmDialog('Delete this homework?', () => { Homework.deleteHomework(id); App.showToast('Deleted', 'success'); Homework.renderHomeworkList('homework-list'); });
+        }
+        function viewTeacher(id) { App.showToast('Teacher: ' + (Teachers.getTeacherById(id)?.name || id), 'info'); }
+        function editTeacher(id) { App.showToast('Edit teacher - use similar modal pattern', 'info'); }
+        function viewParent(id) { App.showToast('Parent: ' + (Parents.getParentById(id)?.fatherName || id), 'info'); }
+        function editParent(id) { App.showToast('Edit parent', 'info'); }
+        function openAddParentModal() { App.showToast('Add parent form - data can be added via students linking', 'info'); }
+        function openAddTeacherModal() { App.showToast('Add teacher - use demo data or extend form', 'info'); }
+        function openAddFeeModal() { App.showToast('Add fee payment - select student and enter amounts', 'info'); }
+        function openAddExamModal() { App.showToast('Add exam form', 'info'); }
+        function openAddHomeworkModal() { App.showToast('Add homework form', 'info'); }
+        function openAddNoticeModal() { App.showToast('Add notice form', 'info'); }
+        function editExam(id) { App.showToast('Edit exam', 'info'); }
+        function editFee(id) { App.showToast('Edit fee', 'info'); }
+        function viewFeeReceipt(id) {
+            document.getElementById('receipt-content').innerHTML = Fees.generateFeeReceiptHTML(id);
+            App.openModal('receipt-modal');
+        }
+        function updateAdmissionStatus(id, status) {
+            Admissions.updateAdmission(id, { status });
+            App.showToast('Status updated', 'success');
+            Admissions.renderAdmissionsTable('admissions-table');
+        }
+        function enrollAdmission(id) {
+            const s = Admissions.enrollStudent(id);
+            if (s) { App.showToast('Student enrolled: ' + s.name, 'success'); Admissions.renderAdmissionsTable('admissions-table'); }
+        }
+        function markNotificationRead(id) { Notifications.markAsRead(id); loadNotifications(); }
+        function deleteTimetable(id) { Timetable.deleteTimetableEntry(id); loadTimetable(); }
+        function loadStudentsPage(p) { Students.renderStudentsTable('students-table', { page: p, search: document.getElementById('student-search')?.value }); }
+
+        function initIDCardSelect() {
+            const sel = document.getElementById('idcard-student');
+            sel.innerHTML = '<option value="">Select Student</option>' + Students.getStudents().map(s => `<option value="${s.id}">${s.name} - ${s.className}</option>`).join('');
+        }
+        function generateIDCard() {
+            const id = document.getElementById('idcard-student').value;
+            const s = Students.getStudentById(id);
+            if (!s) { App.showToast('Select a student', 'warning'); return; }
+            const settings = DB.getSettings();
+            document.getElementById('idcard-preview').innerHTML = `
+                <div class="id-card" style="max-width:350px;margin:20px auto;border:3px solid #0a2540;border-radius:12px;overflow:hidden;">
+                    <div style="background:#0a2540;color:white;padding:15px;text-align:center;">
+                        <h3 style="color:white;font-size:0.95rem;margin:0;">${settings.schoolName}</h3>
+                        <p style="color:#d4a017;font-size:0.75rem;margin:3px 0 0;">STUDENT ID CARD</p>
+                    </div>
+                    <div style="padding:20px;text-align:center;">
+                        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0a2540,#d4a017);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;color:white;font-size:2rem;"><i class="fas fa-user"></i></div>
+                        <h3 style="margin:0 0 5px;">${App.escapeHtml(s.name)}</h3>
+                        <p style="margin:3px 0;font-size:0.9rem;">${App.escapeHtml(s.className)} - ${App.escapeHtml(s.section)}</p>
+                        <p style="margin:3px 0;font-size:0.85rem;">Roll: ${App.escapeHtml(s.rollNo)} | ID: ${s.id}</p>
+                        <p style="margin:8px 0 0;font-size:0.8rem;color:#666;">${settings.phone}</p>
+                    </div>
+                </div>`;
+        }
+
+        function initCertSelect() {
+            const sel = document.getElementById('cert-student');
+            sel.innerHTML = '<option value="">Select Student</option>' + Students.getStudents().map(s => `<option value="${s.id}">${s.name} - ${s.className}</option>`).join('');
+        }
+        function generateCertificate() {
+            const id = document.getElementById('cert-student').value;
+            const type = document.getElementById('cert-type').value;
+            const s = Students.getStudentById(id);
+            if (!s) { App.showToast('Select a student', 'warning'); return; }
+            const settings = DB.getSettings();
+            const titles = { character: 'CHARACTER CERTIFICATE', leaving: 'SCHOOL LEAVING CERTIFICATE', achievement: 'ACHIEVEMENT CERTIFICATE', participation: 'PARTICIPATION CERTIFICATE' };
+            document.getElementById('cert-preview').innerHTML = `
+                <div class="certificate" style="border:4px double #0a2540;padding:40px;text-align:center;max-width:700px;margin:20px auto;">
+                    <h1 style="color:#0a2540;font-size:1.5rem;">${settings.schoolName}</h1>
+                    <p style="color:#d4a017;">${settings.tagline}</p>
+                    <h2 style="margin:30px 0;color:#0a2540;letter-spacing:3px;">${titles[type]}</h2>
+                    <p style="font-size:1.1rem;line-height:1.8;">This is to certify that <strong>${App.escapeHtml(s.name)}</strong>,
+                    son/daughter of <strong>${App.escapeHtml(s.fatherName)}</strong>, 
+                    was a bonafide student of this school in <strong>${App.escapeHtml(s.className)}</strong>.
+                    ${type === 'character' ? 'During his/her stay, he/she bore a good moral character.' : ''}
+                    ${type === 'leaving' ? 'He/She left the school with a good reputation.' : ''}
+                    ${type === 'achievement' ? 'He/She has achieved outstanding performance.' : ''}
+                    ${type === 'participation' ? 'He/She actively participated in school activities.' : ''}
+                    </p>
+                    <p style="margin-top:20px;">Date: ${new Date().toLocaleDateString()}</p>
+                    <div style="margin-top:50px;display:flex;justify-content:space-between;">
+                        <div><div style="border-top:1px solid #333;width:150px;padding-top:5px;">Class Teacher</div></div>
+                        <div><div style="border-top:1px solid #333;width:150px;padding-top:5px;">Principal</div></div>
+                    </div>
+                </div>`;
+        }
+
+        function doGlobalSearch(query) {
+            if (query.length < 2) return;
+            const results = App.globalSearch(query);
+            showSection('search');
+            document.getElementById('search-results').innerHTML = results.length === 0 
+                ? '<div class="empty-state"><h3>No results found</h3></div>'
+                : results.map(r => `<div class="panel" style="margin-bottom:8px;"><div class="panel-body" style="padding:12px;">
+                    <span class="badge badge-primary">${r.type}</span>
+                    <strong style="margin-left:8px;">${App.escapeHtml(r.title)}</strong>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:3px;">${App.escapeHtml(r.subtitle)}</p>
+                </div></div>`).join('');
+        }
+
+        // Init class filters
+        document.addEventListener('DOMContentLoaded', function() {
+            const classOpts = DB.getRecords(DB.keys.classes).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            ['student-class-filter', 'wa-class-filter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML += classOpts;
+            });
+            loadDashboard();
+            Notifications.updateNotificationBadge();
+        });
+    </script>
+</body>
+</html>

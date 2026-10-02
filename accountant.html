@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant Portal - AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="dashboard-body">
+    <div class="sidebar-overlay" onclick="App.toggleSidebar()"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+            <div><h2>Accountant</h2><span>AFH Public Schools</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active" onclick="showASection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#" onclick="showASection('fees')"><i class="fas fa-money-bill-wave"></i> Fee Management</a>
+            <a href="#" onclick="showASection('defaulters')"><i class="fas fa-exclamation-triangle"></i> Defaulters</a>
+            <a href="#" onclick="showASection('payroll')"><i class="fas fa-wallet"></i> Payroll</a>
+            <a href="#" onclick="showASection('reports')"><i class="fas fa-file-export"></i> Reports</a>
+            <a href="#" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info"><div class="avatar">A</div><div><div class="user-name">Accountant</div><div class="user-role">Accountant</div></div>
+        </div>
+    </aside>
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="App.toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h1 id="a-title">Accountant Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" onclick="App.toggleTheme()"><i class="fas fa-moon"></i></button>
+                <a href="https://wa.me/923168122916" target="_blank" class="topbar-btn" style="color:#25d366;"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="content-area">
+            <div id="a-dashboard">
+                <div class="stats-grid" id="a-stats"></div>
+                <div class="panel"><div class="panel-header"><h2>Recent Fee Payments</h2></div><div class="panel-body" id="a-recent-fees"></div></div>
+            </div>
+            <div id="a-fees" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Fee Management</h2></div>
+                <div class="panel-body">
+                    <div class="filters-bar">
+                        <input type="text" id="a-fee-search" placeholder="Search..." oninput="loadAFees()">
+                        <select id="a-fee-status" onchange="loadAFees()">
+                            <option value="">All</option><option value="Paid">Paid</option><option value="Partial">Partial</option><option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                    <div id="a-fees-table"></div>
+                </div></div>
+            </div>
+            <div id="a-defaulters" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Fee Defaulters</h2></div><div class="panel-body" id="a-defaulters-table"></div></div>
+            </div>
+            <div id="a-payroll" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Payroll</h2></div><div class="panel-body" id="a-payroll-list"></div></div>
+            </div>
+            <div id="a-reports" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Reports</h2></div>
+                <div class="panel-body">
+                    <button class="btn btn-primary" onclick="Reports.generateReport('fees')" style="margin:5px;"><i class="fas fa-download"></i> Export Fees</button>
+                    <button class="btn btn-primary" onclick="Reports.generateReport('defaulters')" style="margin:5px;"><i class="fas fa-download"></i> Export Defaulters</button>
+                </div></div>
+            </div>
+        </div>
+    </div>
+    <!-- Receipt Modal -->
+    <div class="modal" id="a-receipt-modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header"><h2>Fee Receipt</h2><button class="modal-close" onclick="App.closeModal('a-receipt-modal')">&times;</button></div>
+            <div class="modal-body" id="a-receipt-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal('a-receipt-modal')">Close</button>
+                <button class="btn btn-primary" onclick="App.printElement('a-receipt-content','Fee Receipt')"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/whatsapp.js"></script>
+    <script src="js/students.js"></script>
+    <script src="js/fees.js"></script>
+    <script src="js/reports.js"></script>
+    <script>
+        Auth.protectPage(['accountant', 'admin']);
+        function showASection(name) {
+            ['dashboard','fees','defaulters','payroll','reports'].forEach(s => {
+                const el = document.getElementById('a-' + s);
+                if (el) el.style.display = s === name ? 'block' : 'none';
+            });
+            document.getElementById('a-title').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            if (name === 'fees') loadAFees();
+            if (name === 'defaulters') Fees.renderFeeDefaultersTable('a-defaulters-table');
+            if (name === 'payroll') {
+                const payroll = DB.getRecords(DB.keys.payroll);
+                document.getElementById('a-payroll-list').innerHTML = `<div class="table-responsive"><table class="data-table"><thead><tr><th>Teacher</th><th>Month</th><th>Basic</th><th>Net</th><th>Status</th></tr></thead><tbody>
+                    ${payroll.map(p => `<tr><td>${p.teacherName}</td><td>${p.month}</td><td>${App.formatCurrency(p.basicSalary)}</td><td>${App.formatCurrency(p.netSalary)}</td><td><span class="badge badge-success">${p.status}</span></td></tr>`).join('')}
+                </tbody></table></div>`;
+            }
+        }
+        function loadAFees() {
+            Fees.renderFeesTable('a-fees-table', {
+                search: document.getElementById('a-fee-search')?.value,
+                filters: { status: document.getElementById('a-fee-status')?.value }
+            });
+        }
+        function viewFeeReceipt(id) {
+            document.getElementById('a-receipt-content').innerHTML = Fees.generateFeeReceiptHTML(id);
+            App.openModal('a-receipt-modal');
+        }
+        function editFee(id) { App.showToast('Edit fee record: ' + id, 'info'); }
+        function confirmDeleteFee(id) {
+            App.confirmDialog('Delete this fee record?', () => { Fees.deleteFee(id); App.showToast('Deleted', 'success'); loadAFees(); });
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const stats = App.getDashboardStats();
+            document.getElementById('a-stats').innerHTML = `
+                <div class="stat-box"><div class="stat-icon orange"><i class="fas fa-money-bill"></i></div><div class="stat-info"><h3>${stats.pendingFees}</h3><p>Pending Fees</p></div></div>
+                <div class="stat-box"><div class="stat-icon red"><i class="fas fa-exclamation"></i></div><div class="stat-info"><h3>${App.formatCurrency(stats.pendingAmount)}</h3><p>Pending Amount</p></div></div>
+                <div class="stat-box"><div class="stat-icon green"><i class="fas fa-coins"></i></div><div class="stat-info"><h3>${App.formatCurrency(stats.todayCollection)}</h3><p>Today Collection</p></div></div>
+                <div class="stat-box"><div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div><div class="stat-info"><h3>${stats.totalStudents}</h3><p>Total Students</p></div></div>
+            `;
+            Fees.renderFeesTable('a-recent-fees', {});
+        });
+    </script>
+</body>
+</html>

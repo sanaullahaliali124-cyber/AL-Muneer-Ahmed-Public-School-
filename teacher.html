@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal - AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="dashboard-body">
+    <div class="sidebar-overlay" onclick="App.toggleSidebar()"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+            <div><h2>Teacher Portal</h2><span>AFH Public Schools</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active" onclick="showTSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#" onclick="showTSection('attendance')"><i class="fas fa-calendar-check"></i> Attendance</a>
+            <a href="#" onclick="showTSection('homework')"><i class="fas fa-book-open"></i> Homework</a>
+            <a href="#" onclick="showTSection('results')"><i class="fas fa-chart-bar"></i> Enter Marks</a>
+            <a href="#" onclick="showTSection('timetable')"><i class="fas fa-clock"></i> Timetable</a>
+            <a href="#" onclick="showTSection('students')"><i class="fas fa-user-graduate"></i> My Students</a>
+            <a href="#" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info"><div class="avatar">T</div><div><div class="user-name">Teacher</div><div class="user-role">Teacher</div></div>
+        </div>
+    </aside>
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="App.toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h1 id="t-title">Teacher Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" onclick="App.toggleTheme()"><i class="fas fa-moon"></i></button>
+                <a href="https://wa.me/923168122916" target="_blank" class="topbar-btn" style="color:#25d366;"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="content-area">
+            <div id="t-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-box"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><h3 id="t-students-count">0</h3><p>Students</p></div></div>
+                    <div class="stat-box"><div class="stat-icon green"><i class="fas fa-book"></i></div><div class="stat-info"><h3 id="t-hw-count">0</h3><p>Homework</p></div></div>
+                    <div class="stat-box"><div class="stat-icon orange"><i class="fas fa-clipboard-list"></i></div><div class="stat-info"><h3 id="t-exams-count">0</h3><p>Exams</p></div></div>
+                </div>
+                <div class="panel"><div class="panel-header"><h2>Recent Homework</h2></div><div class="panel-body" id="t-hw-list"></div></div>
+            </div>
+            <div id="t-attendance" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Mark Attendance</h2></div>
+                <div class="panel-body">
+                    <div class="filters-bar">
+                        <input type="date" id="t-att-date">
+                        <select id="t-att-class"></select>
+                        <select id="t-att-section"><option>A</option><option>B</option></select>
+                        <button class="btn btn-primary btn-sm" onclick="loadTAttendance()">Load</button>
+                    </div>
+                    <div id="t-att-sheet"></div>
+                </div></div>
+            </div>
+            <div id="t-homework" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Homework</h2>
+                    <button class="btn btn-primary btn-sm" onclick="addTHomework()"><i class="fas fa-plus"></i> Add</button>
+                </div><div class="panel-body" id="t-homework-list"></div></div>
+            </div>
+            <div id="t-results" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Results</h2></div><div class="panel-body" id="t-results-list"></div></div>
+            </div>
+            <div id="t-timetable" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Timetable</h2></div><div class="panel-body" id="t-tt-view"></div></div>
+            </div>
+            <div id="t-students" style="display:none;">
+                <div class="panel"><div class="panel-header"><h2>Students</h2></div><div class="panel-body" id="t-students-list"></div></div>
+            </div>
+        </div>
+    </div>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/whatsapp.js"></script>
+    <script src="js/students.js"></script>
+    <script src="js/attendance.js"></script>
+    <script src="js/homework.js"></script>
+    <script src="js/results.js"></script>
+    <script src="js/timetable.js"></script>
+    <script src="js/exams.js"></script>
+    <script>
+        Auth.protectPage(['teacher', 'admin']);
+        function showTSection(name) {
+            ['dashboard','attendance','homework','results','timetable','students'].forEach(s => {
+                const el = document.getElementById('t-' + s);
+                if (el) el.style.display = s === name ? 'block' : 'none';
+            });
+            document.getElementById('t-title').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            if (name === 'homework') Homework.renderHomeworkList('t-homework-list');
+            if (name === 'results') Results.renderResultsTable('t-results-list');
+            if (name === 'students') Students.renderStudentsTable('t-students-list');
+            if (name === 'timetable') Timetable.renderTimetable('t-tt-view', 'Class 5', 'A');
+            if (name === 'attendance') {
+                document.getElementById('t-att-date').value = new Date().toISOString().split('T')[0];
+                const sel = document.getElementById('t-att-class');
+                if (!sel.options.length) DB.getRecords(DB.keys.classes).forEach(c => sel.innerHTML += `<option>${c.name}</option>`);
+            }
+        }
+        function loadTAttendance() {
+            Attendance.renderAttendanceSheet('t-att-sheet', document.getElementById('t-att-class').value, document.getElementById('t-att-section').value, document.getElementById('t-att-date').value);
+        }
+        function addTHomework() {
+            const title = prompt('Homework Title:');
+            if (!title) return;
+            Homework.addHomework({ title, className: 'Class 5', section: 'A', subject: 'Mathematics', description: prompt('Description:') || '', dueDate: new Date().toISOString().split('T')[0] });
+            App.showToast('Homework added', 'success');
+            Homework.renderHomeworkList('t-homework-list');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('t-students-count').textContent = Students.getStudents().length;
+            document.getElementById('t-hw-count').textContent = Homework.getHomework().length;
+            document.getElementById('t-exams-count').textContent = Exams.getExams().length;
+            Homework.renderHomeworkList('t-hw-list');
+        });
+    </script>
+</body>
+</html>

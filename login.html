@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="logo-area">
+                <img src="assets/logo.png" alt="Logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230a2540%22 width=%22100%22 height=%22100%22 rx=%2250%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23d4a017%22 font-size=%2230%22 font-family=%22Arial%22 font-weight=%22bold%22>AFH</text></svg>'">
+                <h1>AL FIDA HUSSAIN PUBLIC SCHOOLS</h1>
+                <p>Quality Education, Bright Future</p>
+            </div>
+            <form id="login-form" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+                </div>
+                <div id="login-error" style="color:#ef4444;font-size:0.9rem;margin-bottom:15px;display:none;"></div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+            <div class="demo-credentials">
+                <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>Teacher:</strong> teacher / teacher123</p>
+                <p><strong>Accountant:</strong> accountant / accountant123</p>
+                <p><strong>Parent:</strong> parent / parent123</p>
+                <p><strong>Student:</strong> student / student123</p>
+            </div>
+            <p style="text-align:center;margin-top:20px;">
+                <a href="index.html" style="color:#0a2540;font-size:0.9rem;"><i class="fas fa-arrow-left"></i> Back to Website</a>
+            </p>
+        </div>
+    </div>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Redirect if already logged in
+        if (Auth.isLoggedIn()) {
+            Auth.redirectToDashboard(Auth.getSession().role);
+        }
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const result = Auth.login(username, password);
+            if (result.success) {
+                Auth.redirectToDashboard(result.user.role);
+            } else {
+                const err = document.getElementById('login-error');
+                err.textContent = result.message;
+                err.style.display = 'block';
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
