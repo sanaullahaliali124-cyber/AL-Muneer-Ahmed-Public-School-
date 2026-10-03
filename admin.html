@@ -339,14 +339,25 @@
             <!-- ID CARDS -->
             <div id="section-idcards" class="content-section" style="display:none;">
                 <div class="panel">
-                    <div class="panel-header"><h2>ID Card Generator</h2></div>
+                    <div class="panel-header">
+                        <h2><i class="fas fa-id-card"></i> Student ID Card Generator</h2>
+                    </div>
                     <div class="panel-body">
                         <div class="filters-bar">
-                            <select id="idcard-student"><option value="">Select Student</option></select>
-                            <button class="btn btn-primary btn-sm" onclick="generateIDCard()"><i class="fas fa-id-card"></i> Generate</button>
-                            <button class="btn btn-secondary btn-sm" onclick="App.printElement('idcard-preview','ID Card')"><i class="fas fa-print"></i> Print</button>
+                            <select id="idcard-class" onchange="filterIDCardStudents()">
+                                <option value="">All Classes</option>
+                            </select>
+                            <select id="idcard-student">
+                                <option value="">Select Student</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="generateIDCard()"><i class="fas fa-id-card"></i> Generate Card</button>
+                            <button class="btn btn-success btn-sm" onclick="generateClassIDCards()"><i class="fas fa-users"></i> Generate Class Cards</button>
+                            <button class="btn btn-secondary btn-sm" onclick="printIDCards()"><i class="fas fa-print"></i> Print</button>
                         </div>
-                        <div id="idcard-preview"></div>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:15px;">
+                            Select a student for single ID card, or select a class and click <strong>Generate Class Cards</strong> for all students in that class.
+                        </p>
+                        <div id="idcard-preview" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:15px;background:var(--body-bg);border-radius:12px;min-height:200px;"></div>
                     </div>
                 </div>
             </div>
@@ -735,6 +746,13 @@
             App.openModal('student-modal');
         }
         function viewStudent(id) { editStudent(id); }
+        function quickIDCard(id) {
+            showSection('idcards');
+            setTimeout(function() {
+                document.getElementById('idcard-student').value = id;
+                generateIDCard();
+            }, 100);
+        }
         function confirmDeleteStudent(id) {
             App.confirmDialog('Delete this student?', () => { Students.deleteStudent(id); App.showToast('Student deleted', 'success'); loadStudents(); });
         }
@@ -783,28 +801,160 @@
         function loadStudentsPage(p) { Students.renderStudentsTable('students-table', { page: p, search: document.getElementById('student-search')?.value }); }
 
         function initIDCardSelect() {
+            const classSel = document.getElementById('idcard-class');
+            const classes = DB.getRecords(DB.keys.classes);
+            classSel.innerHTML = '<option value="">All Classes</option>' + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            filterIDCardStudents();
+        }
+        function filterIDCardStudents() {
+            const className = document.getElementById('idcard-class').value;
+            let students = Students.getStudents().filter(s => s.status === 'Active');
+            if (className) students = students.filter(s => s.className === className);
             const sel = document.getElementById('idcard-student');
-            sel.innerHTML = '<option value="">Select Student</option>' + Students.getStudents().map(s => `<option value="${s.id}">${s.name} - ${s.className}</option>`).join('');
+            sel.innerHTML = '<option value="">Select Student</option>' + students.map(s =>
+                `<option value="${s.id}">${s.name} - ${s.className} (${s.section})</option>`
+            ).join('');
+        }
+        function buildStudentIDCardHTML(s, settings) {
+            const session = settings.academicSession || '2025-2026';
+            const initial = (s.name || 'S').charAt(0).toUpperCase();
+            const genderIcon = s.gender === 'Female' ? 'fa-female' : 'fa-male';
+            return `
+            <div class="student-id-card" style="
+                width: 340px;
+                height: 215px;
+                background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+                border: 2px solid #0a2540;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                position: relative;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                page-break-inside: avoid;
+                display: inline-block;
+                margin: 5px;
+            ">
+                <!-- Top Header Bar -->
+                <div style="background: linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%); padding: 8px 12px; display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #d4a017; display: flex; align-items: center; justify-content: center; color: #0a2540; font-weight: 800; font-size: 12px; border: 2px solid #fff; flex-shrink: 0;">AMA</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="color: #fff; font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(settings.schoolName)}</div>
+                        <div style="color: #d4a017; font-size: 9px; font-weight: 600;">STUDENT IDENTITY CARD</div>
+                    </div>
+                    <div style="color: #d4a017; font-size: 8px; text-align: right; line-height: 1.2;">
+                        Session<br><strong style="color:#fff;">${session}</strong>
+                    </div>
+                </div>
+                <!-- Body -->
+                <div style="display: flex; padding: 10px 12px; gap: 12px; height: calc(100% - 72px);">
+                    <!-- Photo -->
+                    <div style="flex-shrink: 0; text-align: center;">
+                        <div style="
+                            width: 75px; height: 90px;
+                            background: linear-gradient(160deg, #0a2540, #1a3a5c);
+                            border: 2px solid #d4a017;
+                            border-radius: 6px;
+                            display: flex; align-items: center; justify-content: center;
+                            color: #d4a017; font-size: 28px;
+                        "><i class="fas ${genderIcon}"></i></div>
+                        <div style="margin-top: 4px; font-size: 8px; color: #64748b; font-weight: 600;">PHOTO</div>
+                    </div>
+                    <!-- Details -->
+                    <div style="flex: 1; font-size: 11px; line-height: 1.45; color: #1e293b; overflow: hidden;">
+                        <div style="font-size: 14px; font-weight: 700; color: #0a2540; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(s.name)}</div>
+                        <div style="display: grid; grid-template-columns: 70px 1fr; gap: 1px 4px;">
+                            <span style="color: #64748b; font-weight: 600;">Father</span>
+                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(s.fatherName || '-')}</span>
+                            <span style="color: #64748b; font-weight: 600;">Class</span>
+                            <span style="font-weight: 600;">${App.escapeHtml(s.className || '-')} - ${App.escapeHtml(s.section || '')}</span>
+                            <span style="color: #64748b; font-weight: 600;">Roll No</span>
+                            <span style="font-weight: 600;">${App.escapeHtml(s.rollNo || '-')}</span>
+                            <span style="color: #64748b; font-weight: 600;">Adm No</span>
+                            <span style="font-weight: 600;">${App.escapeHtml(s.admissionNo || s.id)}</span>
+                            <span style="color: #64748b; font-weight: 600;">DOB</span>
+                            <span style="font-weight: 600;">${s.dob ? App.formatDate(s.dob) : '-'}</span>
+                            <span style="color: #64748b; font-weight: 600;">Blood</span>
+                            <span style="font-weight: 600;">${s.bloodGroup || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <!-- QR / Code side -->
+                    <div style="flex-shrink: 0; text-align: center; width: 55px;">
+                        <div style="
+                            width: 50px; height: 50px;
+                            background: #fff;
+                            border: 1px solid #cbd5e1;
+                            border-radius: 4px;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 8px; color: #94a3b8; flex-direction: column;
+                        ">
+                            <i class="fas fa-qrcode" style="font-size: 28px; color: #0a2540;"></i>
+                        </div>
+                        <div style="font-size: 7px; color: #64748b; margin-top: 3px; word-break: break-all; line-height: 1.2;">${App.escapeHtml((s.id || '').replace('STU_', ''))}</div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div style="
+                    position: absolute; bottom: 0; left: 0; right: 0;
+                    background: #0a2540; color: #fff;
+                    padding: 4px 12px; font-size: 8px;
+                    display: flex; justify-content: space-between; align-items: center;
+                ">
+                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03168122916')}</span>
+                    <span style="color:#d4a017; font-weight: 600;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</span>
+                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03168122916')}</span>
+                </div>
+            </div>`;
         }
         function generateIDCard() {
             const id = document.getElementById('idcard-student').value;
             const s = Students.getStudentById(id);
-            if (!s) { App.showToast('Select a student', 'warning'); return; }
+            if (!s) { App.showToast('Please select a student', 'warning'); return; }
             const settings = DB.getSettings();
-            document.getElementById('idcard-preview').innerHTML = `
-                <div class="id-card" style="max-width:350px;margin:20px auto;border:3px solid #0a2540;border-radius:12px;overflow:hidden;">
-                    <div style="background:#0a2540;color:white;padding:15px;text-align:center;">
-                        <h3 style="color:white;font-size:0.95rem;margin:0;">${settings.schoolName}</h3>
-                        <p style="color:#d4a017;font-size:0.75rem;margin:3px 0 0;">STUDENT ID CARD</p>
-                    </div>
-                    <div style="padding:20px;text-align:center;">
-                        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0a2540,#d4a017);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;color:white;font-size:2rem;"><i class="fas fa-user"></i></div>
-                        <h3 style="margin:0 0 5px;">${App.escapeHtml(s.name)}</h3>
-                        <p style="margin:3px 0;font-size:0.9rem;">${App.escapeHtml(s.className)} - ${App.escapeHtml(s.section)}</p>
-                        <p style="margin:3px 0;font-size:0.85rem;">Roll: ${App.escapeHtml(s.rollNo)} | ID: ${s.id}</p>
-                        <p style="margin:8px 0 0;font-size:0.8rem;color:#666;">${settings.phone}</p>
-                    </div>
-                </div>`;
+            document.getElementById('idcard-preview').innerHTML = buildStudentIDCardHTML(s, settings);
+            App.showToast('ID Card generated for ' + s.name, 'success');
+        }
+        function generateClassIDCards() {
+            const className = document.getElementById('idcard-class').value;
+            if (!className) { App.showToast('Please select a class first', 'warning'); return; }
+            let students = Students.getStudents().filter(s => s.className === className && s.status === 'Active');
+            students.sort((a, b) => (a.rollNo || '').localeCompare(b.rollNo || ''));
+            if (students.length === 0) { App.showToast('No active students in this class', 'warning'); return; }
+            const settings = DB.getSettings();
+            document.getElementById('idcard-preview').innerHTML = students.map(s => buildStudentIDCardHTML(s, settings)).join('');
+            App.showToast(students.length + ' ID Cards generated for ' + className, 'success');
+        }
+        function printIDCards() {
+            const preview = document.getElementById('idcard-preview');
+            if (!preview || !preview.innerHTML.trim()) {
+                App.showToast('Generate ID cards first', 'warning');
+                return;
+            }
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Student ID Cards - AL Muneer Ahmed Public School</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 10mm; background: #fff; }
+                        .print-grid { display: flex; flex-wrap: wrap; gap: 8mm; justify-content: center; }
+                        .student-id-card { break-inside: avoid; page-break-inside: avoid; }
+                        @media print {
+                            body { padding: 5mm; }
+                            .student-id-card { box-shadow: none !important; }
+                        }
+                        @page { size: A4; margin: 8mm; }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-grid">${preview.innerHTML}</div>
+                    <script>window.onload = function() { setTimeout(function(){ window.print(); }, 400); }<\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function initCertSelect() {
