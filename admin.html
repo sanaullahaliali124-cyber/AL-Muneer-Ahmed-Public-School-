@@ -8,44 +8,51 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="dashboard-body">
     <div class="sidebar-overlay" onclick="App.toggleSidebar()"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="assets/logo.png" alt="Logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230a2540%22 width=%22100%22 height=%22100%22 rx=%2250%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23d4a017%22 font-size=%2230%22 font-family=%22Arial%22 font-weight=%22bold%22>AMA</text></svg>'">
-            <div><h2>AL Muneer Ahmed</h2><span>Public School</span></div>
+            <div class="sidebar-brand">
+                <h2>AL Muneer Ahmed Public School</h2>
+                <span>Quality Education, Bright Future</span>
+            </div>
+            <button type="button" class="sidebar-collapse-btn" onclick="App.toggleSidebarCollapse()" title="Hide / Show Sidebar">
+                <i class="fas fa-angles-left"></i>
+            </button>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section">Main</div>
-            <a href="#" class="active" data-section="dashboard" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="#" data-section="students" onclick="showSection('students')"><i class="fas fa-user-graduate"></i> Students</a>
-            <a href="#" data-section="parents" onclick="showSection('parents')"><i class="fas fa-users"></i> Parents</a>
-            <a href="#" data-section="teachers" onclick="showSection('teachers')"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
-            <a href="#" data-section="classes" onclick="showSection('classes')"><i class="fas fa-school"></i> Classes</a>
+            <a href="#" class="active" data-section="dashboard" onclick="showSection('dashboard', event)"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#" data-section="students" onclick="showSection('students', event)"><i class="fas fa-user-graduate"></i> Students</a>
+            <a href="#" data-section="parents" onclick="showSection('parents', event)"><i class="fas fa-users"></i> Parents</a>
+            <a href="#" data-section="teachers" onclick="showSection('teachers', event)"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+            <a href="#" data-section="classes" onclick="showSection('classes', event)"><i class="fas fa-school"></i> Classes</a>
             <div class="nav-section">Academic</div>
-            <a href="#" data-section="attendance" onclick="showSection('attendance')"><i class="fas fa-calendar-check"></i> Attendance</a>
-            <a href="#" data-section="fees" onclick="showSection('fees')"><i class="fas fa-money-bill-wave"></i> Fees</a>
-            <a href="#" data-section="exams" onclick="showSection('exams')"><i class="fas fa-file-alt"></i> Exams</a>
-            <a href="#" data-section="results" onclick="showSection('results')"><i class="fas fa-chart-bar"></i> Results</a>
-            <a href="#" data-section="timetable" onclick="showSection('timetable')"><i class="fas fa-clock"></i> Timetable</a>
-            <a href="#" data-section="homework" onclick="showSection('homework')"><i class="fas fa-book-open"></i> Homework</a>
+            <a href="#" data-section="attendance" onclick="showSection('attendance', event)"><i class="fas fa-calendar-check"></i> Attendance</a>
+            <a href="#" data-section="fees" onclick="showSection('fees', event)"><i class="fas fa-money-bill-wave"></i> Fees</a>
+            <a href="#" data-section="exams" onclick="showSection('exams', event)"><i class="fas fa-file-alt"></i> Exams</a>
+            <a href="#" data-section="results" onclick="showSection('results', event)"><i class="fas fa-chart-bar"></i> Results</a>
+            <a href="#" data-section="timetable" onclick="showSection('timetable', event)"><i class="fas fa-clock"></i> Timetable</a>
+            <a href="#" data-section="homework" onclick="showSection('homework', event)"><i class="fas fa-book-open"></i> Homework</a>
             <div class="nav-section">Communication</div>
-            <a href="#" data-section="whatsapp" onclick="showSection('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp Contacts</a>
-            <a href="#" data-section="defaulters" onclick="showSection('defaulters')"><i class="fas fa-exclamation-triangle"></i> Fee Defaulters</a>
-            <a href="#" data-section="absent-wa" onclick="showSection('absent-wa')"><i class="fas fa-user-times"></i> Absent WhatsApp</a>
-            <a href="#" data-section="notices" onclick="showSection('notices')"><i class="fas fa-bullhorn"></i> Notices</a>
-            <a href="#" data-section="events" onclick="showSection('events')"><i class="fas fa-calendar-alt"></i> Events</a>
+            <a href="#" data-section="whatsapp" onclick="showSection('whatsapp', event)"><i class="fab fa-whatsapp"></i> WhatsApp Contacts</a>
+            <a href="#" data-section="defaulters" onclick="showSection('defaulters', event)"><i class="fas fa-exclamation-triangle"></i> Fee Defaulters</a>
+            <a href="#" data-section="absent-wa" onclick="showSection('absent-wa', event)"><i class="fas fa-user-times"></i> Absent WhatsApp</a>
+            <a href="#" data-section="notices" onclick="showSection('notices', event)"><i class="fas fa-bullhorn"></i> Notices</a>
+            <a href="#" data-section="events" onclick="showSection('events', event)"><i class="fas fa-calendar-alt"></i> Events</a>
             <div class="nav-section">Management</div>
-            <a href="#" data-section="admissions" onclick="showSection('admissions')"><i class="fas fa-user-plus"></i> Admissions</a>
-            <a href="#" data-section="library" onclick="showSection('library')"><i class="fas fa-book"></i> Library</a>
-            <a href="#" data-section="transport" onclick="showSection('transport')"><i class="fas fa-bus"></i> Transport</a>
-            <a href="#" data-section="payroll" onclick="showSection('payroll')"><i class="fas fa-wallet"></i> Payroll</a>
-            <a href="#" data-section="idcards" onclick="showSection('idcards')"><i class="fas fa-id-card"></i> ID Cards</a>
-            <a href="#" data-section="certificates" onclick="showSection('certificates')"><i class="fas fa-certificate"></i> Certificates</a>
-            <a href="#" data-section="reports" onclick="showSection('reports')"><i class="fas fa-file-export"></i> Reports</a>
-            <a href="#" data-section="notifications" onclick="showSection('notifications')"><i class="fas fa-bell"></i> Notifications</a>
-            <a href="#" data-section="settings" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" data-section="admissions" onclick="showSection('admissions', event)"><i class="fas fa-user-plus"></i> Admissions</a>
+            <a href="#" data-section="library" onclick="showSection('library', event)"><i class="fas fa-book"></i> Library</a>
+            <a href="#" data-section="transport" onclick="showSection('transport', event)"><i class="fas fa-bus"></i> Transport</a>
+            <a href="#" data-section="payroll" onclick="showSection('payroll', event)"><i class="fas fa-wallet"></i> Payroll</a>
+            <a href="#" data-section="idcards" onclick="showSection('idcards', event)"><i class="fas fa-id-card"></i> ID Cards</a>
+            <a href="#" data-section="certificates" onclick="showSection('certificates', event)"><i class="fas fa-certificate"></i> Certificates</a>
+            <a href="#" data-section="reports" onclick="showSection('reports', event)"><i class="fas fa-file-export"></i> Reports</a>
+            <a href="#" data-section="notifications" onclick="showSection('notifications', event)"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#" data-section="settings" onclick="showSection('settings', event)"><i class="fas fa-cog"></i> Settings</a>
             <a href="#" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
         <div class="sidebar-footer">
@@ -68,7 +75,7 @@
                     <input type="text" id="global-search" placeholder="Search students, teachers..." oninput="doGlobalSearch(this.value)">
                 </div>
                 <button class="topbar-btn" onclick="App.toggleTheme()" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-                <button class="topbar-btn" onclick="showSection('notifications')" title="Notifications">
+                <button class="topbar-btn" onclick="showSection('notifications', event)" title="Notifications">
                     <i class="fas fa-bell"></i>
                     <span class="badge notification-badge">0</span>
                 </button>
@@ -78,20 +85,38 @@
 
         <div class="content-area">
             <!-- DASHBOARD -->
-            <div id="section-dashboard" class="content-section">
+            <div id="section-dashboard" class="content-section active-section">
                 <div class="stats-grid" id="stats-grid"></div>
                 <div class="grid-2">
                     <div class="panel">
-                        <div class="panel-header"><h2>Student by Class</h2></div>
-                        <div class="panel-body"><div class="chart-container" id="chart-students"></div></div>
+                        <div class="panel-header"><h2><i class="fas fa-chart-bar"></i> Students by Class</h2></div>
+                        <div class="panel-body" style="height:280px;position:relative;">
+                            <canvas id="chart-students"></canvas>
+                        </div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h2>Today's Attendance</h2></div>
-                        <div class="panel-body"><div class="chart-container" id="chart-attendance"></div></div>
+                        <div class="panel-header"><h2><i class="fas fa-chart-pie"></i> Today's Attendance</h2></div>
+                        <div class="panel-body" style="height:280px;position:relative;">
+                            <canvas id="chart-attendance"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top:0;">
+                    <div class="panel">
+                        <div class="panel-header"><h2><i class="fas fa-money-bill-wave"></i> Fee Collection Status</h2></div>
+                        <div class="panel-body" style="height:280px;position:relative;">
+                            <canvas id="chart-fees"></canvas>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2><i class="fas fa-venus-mars"></i> Gender Distribution</h2></div>
+                        <div class="panel-body" style="height:280px;position:relative;">
+                            <canvas id="chart-gender"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="panel">
-                    <div class="panel-header"><h2>Recent Notifications</h2></div>
+                    <div class="panel-header"><h2><i class="fas fa-bell"></i> Recent Notifications</h2></div>
                     <div class="panel-body" id="dash-notifications"></div>
                 </div>
             </div>
@@ -340,23 +365,47 @@
             <div id="section-idcards" class="content-section" style="display:none;">
                 <div class="panel">
                     <div class="panel-header">
-                        <h2><i class="fas fa-id-card"></i> Student ID Card Generator</h2>
+                        <h2><i class="fas fa-id-card"></i> ID Card Generator</h2>
                     </div>
                     <div class="panel-body">
-                        <div class="filters-bar">
-                            <select id="idcard-class" onchange="filterIDCardStudents()">
-                                <option value="">All Classes</option>
-                            </select>
-                            <select id="idcard-student">
-                                <option value="">Select Student</option>
-                            </select>
-                            <button class="btn btn-primary btn-sm" onclick="generateIDCard()"><i class="fas fa-id-card"></i> Generate Card</button>
-                            <button class="btn btn-success btn-sm" onclick="generateClassIDCards()"><i class="fas fa-users"></i> Generate Class Cards</button>
-                            <button class="btn btn-secondary btn-sm" onclick="printIDCards()"><i class="fas fa-print"></i> Print</button>
+                        <div class="tabs" style="margin-bottom:20px;">
+                            <button class="tab-btn active" id="tab-student-id" onclick="switchIDCardTab('student')"><i class="fas fa-user-graduate"></i> Student ID Cards</button>
+                            <button class="tab-btn" id="tab-teacher-id" onclick="switchIDCardTab('teacher')"><i class="fas fa-chalkboard-teacher"></i> Teacher ID Cards</button>
                         </div>
-                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:15px;">
-                            Select a student for single ID card, or select a class and click <strong>Generate Class Cards</strong> for all students in that class.
-                        </p>
+
+                        <!-- Student ID Card Controls -->
+                        <div id="idcard-student-controls">
+                            <div class="filters-bar">
+                                <select id="idcard-class" onchange="filterIDCardStudents()">
+                                    <option value="">All Classes</option>
+                                </select>
+                                <select id="idcard-student">
+                                    <option value="">Select Student</option>
+                                </select>
+                                <button class="btn btn-primary btn-sm" onclick="generateIDCard()"><i class="fas fa-id-card"></i> Generate Card</button>
+                                <button class="btn btn-success btn-sm" onclick="generateClassIDCards()"><i class="fas fa-users"></i> Generate Class Cards</button>
+                                <button class="btn btn-secondary btn-sm" onclick="printIDCards()"><i class="fas fa-print"></i> Print</button>
+                            </div>
+                            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:15px;">
+                                Select a student for single ID card, or select a class and click <strong>Generate Class Cards</strong>.
+                            </p>
+                        </div>
+
+                        <!-- Teacher ID Card Controls -->
+                        <div id="idcard-teacher-controls" style="display:none;">
+                            <div class="filters-bar">
+                                <select id="idcard-teacher">
+                                    <option value="">Select Teacher</option>
+                                </select>
+                                <button class="btn btn-primary btn-sm" onclick="generateTeacherIDCard()"><i class="fas fa-id-card"></i> Generate Card</button>
+                                <button class="btn btn-success btn-sm" onclick="generateAllTeacherIDCards()"><i class="fas fa-users"></i> Generate All Teachers</button>
+                                <button class="btn btn-secondary btn-sm" onclick="printIDCards()"><i class="fas fa-print"></i> Print</button>
+                            </div>
+                            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:15px;">
+                                Select a teacher for single ID card, or click <strong>Generate All Teachers</strong> for all staff cards.
+                            </p>
+                        </div>
+
                         <div id="idcard-preview" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:15px;background:var(--body-bg);border-radius:12px;min-height:200px;"></div>
                     </div>
                 </div>
@@ -517,16 +566,44 @@
     <script>
         Auth.protectPage(['admin']);
 
-        function showSection(name) {
-            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        // Store chart instances so we can destroy before re-create
+        window._dashCharts = window._dashCharts || {};
+
+        function showSection(name, evt) {
+            if (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+            }
+            // Hide ALL content sections completely
+            document.querySelectorAll('.content-section').forEach(function(s) {
+                s.style.display = 'none';
+                s.classList.remove('active-section');
+            });
+            // Show only the requested section
             const section = document.getElementById('section-' + name);
-            if (section) section.style.display = 'block';
-            const link = document.querySelector(`.sidebar-nav a[data-section="${name}"]`);
+            if (section) {
+                section.style.display = 'block';
+                section.classList.add('active-section');
+            }
+            // Sidebar active state
+            document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
+                a.classList.remove('active');
+            });
+            const link = document.querySelector('.sidebar-nav a[data-section="' + name + '"]');
             if (link) link.classList.add('active');
-            const titles = {dashboard:'Dashboard',students:'Students',parents:'Parents',teachers:'Teachers',classes:'Classes',attendance:'Attendance',fees:'Fees',exams:'Exams',results:'Results',timetable:'Timetable',homework:'Homework',whatsapp:'WhatsApp Contacts',defaulters:'Fee Defaulters',absent:'Absent WhatsApp','absent-wa':'Absent WhatsApp',notices:'Notices',events:'Events',admissions:'Admissions',library:'Library',transport:'Transport',payroll:'Payroll',idcards:'ID Cards',certificates:'Certificates',reports:'Reports',notifications:'Notifications',settings:'Settings',search:'Search Results'};
-            document.getElementById('page-title').textContent = titles[name] || name;
-            
+
+            const titles = {
+                dashboard:'Dashboard', students:'Students', parents:'Parents', teachers:'Teachers',
+                classes:'Classes', attendance:'Attendance', fees:'Fees', exams:'Exams', results:'Results',
+                timetable:'Timetable', homework:'Homework', whatsapp:'WhatsApp Contacts',
+                defaulters:'Fee Defaulters', 'absent-wa':'Absent WhatsApp', notices:'Notices',
+                events:'Events', admissions:'Admissions', library:'Library', transport:'Transport',
+                payroll:'Payroll', idcards:'ID Cards', certificates:'Certificates', reports:'Reports',
+                notifications:'Notifications', settings:'Settings', search:'Search Results'
+            };
+            const titleEl = document.getElementById('page-title');
+            if (titleEl) titleEl.textContent = titles[name] || name;
+
             // Load section data
             if (name === 'dashboard') loadDashboard();
             else if (name === 'students') loadStudents();
@@ -541,7 +618,11 @@
             else if (name === 'homework') Homework.renderHomeworkList('homework-list');
             else if (name === 'whatsapp') loadWhatsAppContacts();
             else if (name === 'defaulters') Fees.renderFeeDefaultersTable('defaulters-table');
-            else if (name === 'absent-wa') { document.getElementById('absent-date').value = new Date().toISOString().split('T')[0]; loadAbsentWA(); }
+            else if (name === 'absent-wa') {
+                const d = document.getElementById('absent-date');
+                if (d) d.value = new Date().toISOString().split('T')[0];
+                loadAbsentWA();
+            }
             else if (name === 'notices') loadNotices();
             else if (name === 'events') loadEvents();
             else if (name === 'admissions') Admissions.renderAdmissionsTable('admissions-table');
@@ -552,6 +633,15 @@
             else if (name === 'certificates') initCertSelect();
             else if (name === 'notifications') loadNotifications();
             else if (name === 'settings') Settings.loadSettingsForm();
+
+            return false;
+        }
+
+        function destroyChart(key) {
+            if (window._dashCharts[key]) {
+                try { window._dashCharts[key].destroy(); } catch (e) {}
+                window._dashCharts[key] = null;
+            }
         }
 
         function loadDashboard() {
@@ -567,22 +657,161 @@
                 <div class="stat-box"><div class="stat-icon gold"><i class="fas fa-coins"></i></div><div class="stat-info"><h3>${App.formatCurrency(stats.todayCollection)}</h3><p>Today Collection</p></div></div>
                 <div class="stat-box"><div class="stat-icon navy"><i class="fas fa-user-plus"></i></div><div class="stat-info"><h3>${stats.newAdmissions}</h3><p>New Admissions</p></div></div>
             `;
-            
-            // Simple bar chart for students by class
-            const students = Students.getStudents();
+
+            if (typeof Chart === 'undefined') {
+                Notifications.renderNotifications('dash-notifications');
+                Notifications.updateNotificationBadge();
+                return;
+            }
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(148,163,184,0.15)' : 'rgba(0,0,0,0.06)';
+            const borderColor = isDark ? '#1e293b' : '#ffffff';
+
+            // Students by Class - Bar Chart
+            const students = Students.getStudents().filter(s => s.status === 'Active');
             const classCounts = {};
             students.forEach(s => { classCounts[s.className] = (classCounts[s.className] || 0) + 1; });
-            const maxC = Math.max(...Object.values(classCounts), 1);
-            document.getElementById('chart-students').innerHTML = Object.entries(classCounts).slice(0, 8).map(([name, count]) => 
-                `<div class="chart-bar" style="height:${(count/maxC)*200}px"><span class="bar-value">${count}</span><span class="bar-label">${name.replace('Class ','C')}</span></div>`
-            ).join('');
-            
-            // Attendance chart
-            document.getElementById('chart-attendance').innerHTML = `
-                <div class="chart-bar" style="height:${stats.todayPresent > 0 ? 180 : 10}px;background:linear-gradient(to top,#10b981,#34d399)"><span class="bar-value">${stats.todayPresent}</span><span class="bar-label">Present</span></div>
-                <div class="chart-bar" style="height:${stats.todayAbsent > 0 ? (stats.todayAbsent/Math.max(stats.todayPresent,1))*180 : 10}px;background:linear-gradient(to top,#ef4444,#f87171)"><span class="bar-value">${stats.todayAbsent}</span><span class="bar-label">Absent</span></div>
-            `;
-            
+            const classLabels = Object.keys(classCounts);
+            const classData = Object.values(classCounts);
+
+            destroyChart('students');
+            const elStudents = document.getElementById('chart-students');
+            if (elStudents) {
+                window._dashCharts.students = new Chart(elStudents, {
+                    type: 'bar',
+                    data: {
+                        labels: classLabels,
+                        datasets: [{
+                            label: 'Students',
+                            data: classData,
+                            backgroundColor: 'rgba(10, 37, 64, 0.85)',
+                            borderColor: '#d4a017',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            maxBarThickness: 42
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
+                        },
+                        scales: {
+                            x: { ticks: { color: textColor, maxRotation: 45, font: { size: 10 } }, grid: { display: false } },
+                            y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
+                        }
+                    }
+                });
+            }
+
+            // Attendance - Doughnut (use today; if empty show last available date)
+            let attRecords = DB.getRecords(DB.keys.attendance);
+            const today = new Date().toISOString().split('T')[0];
+            let dayRecords = attRecords.filter(a => a.date === today);
+            if (dayRecords.length === 0 && attRecords.length > 0) {
+                const latest = attRecords.map(a => a.date).sort().reverse()[0];
+                dayRecords = attRecords.filter(a => a.date === latest);
+            }
+            const presentN = dayRecords.filter(a => a.status === 'Present').length;
+            const absentN = dayRecords.filter(a => a.status === 'Absent').length;
+            const lateN = dayRecords.filter(a => a.status === 'Late').length;
+            const leaveN = dayRecords.filter(a => a.status === 'Leave').length;
+
+            destroyChart('attendance');
+            const elAtt = document.getElementById('chart-attendance');
+            if (elAtt) {
+                window._dashCharts.attendance = new Chart(elAtt, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Present', 'Absent', 'Late', 'Leave'],
+                        datasets: [{
+                            data: [presentN || 0, absentN || 0, lateN || 0, leaveN || 0],
+                            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6'],
+                            borderWidth: 2,
+                            borderColor: borderColor
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: textColor, padding: 14, usePointStyle: true } },
+                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
+                        },
+                        cutout: '55%'
+                    }
+                });
+            }
+
+            // Fee Status - Bar
+            const fees = DB.getRecords(DB.keys.fees);
+            const feePaid = fees.filter(f => f.status === 'Paid').length;
+            const feePartial = fees.filter(f => f.status === 'Partial').length;
+            const feePending = fees.filter(f => f.status === 'Pending').length;
+
+            destroyChart('fees');
+            const elFees = document.getElementById('chart-fees');
+            if (elFees) {
+                window._dashCharts.fees = new Chart(elFees, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Paid', 'Partial', 'Pending'],
+                        datasets: [{
+                            label: 'Fee Records',
+                            data: [feePaid, feePartial, feePending],
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                            borderRadius: 8,
+                            maxBarThickness: 55
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
+                        },
+                        scales: {
+                            x: { ticks: { color: textColor }, grid: { display: false } },
+                            y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
+                        }
+                    }
+                });
+            }
+
+            // Gender - Pie
+            const maleCount = students.filter(s => s.gender === 'Male').length;
+            const femaleCount = students.filter(s => s.gender === 'Female').length;
+
+            destroyChart('gender');
+            const elGender = document.getElementById('chart-gender');
+            if (elGender) {
+                window._dashCharts.gender = new Chart(elGender, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Male', 'Female'],
+                        datasets: [{
+                            data: [maleCount, femaleCount],
+                            backgroundColor: ['#3b82f6', '#ec4899'],
+                            borderWidth: 2,
+                            borderColor: borderColor
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: textColor, padding: 14, usePointStyle: true } },
+                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
+                        }
+                    }
+                });
+            }
+
             Notifications.renderNotifications('dash-notifications');
             Notifications.updateNotificationBadge();
         }
@@ -749,9 +978,18 @@
         function quickIDCard(id) {
             showSection('idcards');
             setTimeout(function() {
+                switchIDCardTab('student');
                 document.getElementById('idcard-student').value = id;
                 generateIDCard();
             }, 100);
+        }
+        function quickTeacherIDCard(id) {
+            showSection('idcards');
+            setTimeout(function() {
+                switchIDCardTab('teacher');
+                document.getElementById('idcard-teacher').value = id;
+                generateTeacherIDCard();
+            }, 150);
         }
         function confirmDeleteStudent(id) {
             App.confirmDialog('Delete this student?', () => { Students.deleteStudent(id); App.showToast('Student deleted', 'success'); loadStudents(); });
@@ -805,6 +1043,22 @@
             const classes = DB.getRecords(DB.keys.classes);
             classSel.innerHTML = '<option value="">All Classes</option>' + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             filterIDCardStudents();
+            // Teacher select
+            const tSel = document.getElementById('idcard-teacher');
+            if (tSel) {
+                const teachers = Teachers.getTeachers().filter(t => t.status === 'Active');
+                tSel.innerHTML = '<option value="">Select Teacher</option>' + teachers.map(t =>
+                    `<option value="${t.id}">${t.name}${t.subjects ? ' - ' + (Array.isArray(t.subjects) ? t.subjects.join(', ') : t.subjects) : ''}</option>`
+                ).join('');
+            }
+            switchIDCardTab('student');
+        }
+        function switchIDCardTab(type) {
+            document.getElementById('idcard-student-controls').style.display = type === 'student' ? 'block' : 'none';
+            document.getElementById('idcard-teacher-controls').style.display = type === 'teacher' ? 'block' : 'none';
+            document.getElementById('tab-student-id').classList.toggle('active', type === 'student');
+            document.getElementById('tab-teacher-id').classList.toggle('active', type === 'teacher');
+            document.getElementById('idcard-preview').innerHTML = '';
         }
         function filterIDCardStudents() {
             const className = document.getElementById('idcard-class').value;
@@ -957,6 +1211,105 @@
             printWindow.document.close();
         }
 
+        function buildTeacherIDCardHTML(t, settings) {
+            const session = settings.academicSession || '2025-2026';
+            const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '-');
+            const classes = Array.isArray(t.classes) ? t.classes.join(', ') : (t.classes || '-');
+            return `
+            <div class="student-id-card teacher-id-card" style="
+                width: 340px;
+                height: 215px;
+                background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+                border: 2px solid #0a2540;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                position: relative;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                page-break-inside: avoid;
+                display: inline-block;
+                margin: 5px;
+            ">
+                <div style="background: linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%); padding: 8px 12px; display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #d4a017; display: flex; align-items: center; justify-content: center; color: #0a2540; font-weight: 800; font-size: 12px; border: 2px solid #fff; flex-shrink: 0;">AMA</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="color: #fff; font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(settings.schoolName)}</div>
+                        <div style="color: #d4a017; font-size: 9px; font-weight: 600;">STAFF / TEACHER IDENTITY CARD</div>
+                    </div>
+                    <div style="color: #d4a017; font-size: 8px; text-align: right; line-height: 1.2;">
+                        Session<br><strong style="color:#fff;">${session}</strong>
+                    </div>
+                </div>
+                <div style="display: flex; padding: 10px 12px; gap: 12px; height: calc(100% - 72px);">
+                    <div style="flex-shrink: 0; text-align: center;">
+                        <div style="
+                            width: 75px; height: 90px;
+                            background: linear-gradient(160deg, #0a2540, #d4a017);
+                            border: 2px solid #d4a017;
+                            border-radius: 6px;
+                            display: flex; align-items: center; justify-content: center;
+                            color: #fff; font-size: 28px;
+                        "><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div style="margin-top: 4px; font-size: 8px; color: #64748b; font-weight: 600;">PHOTO</div>
+                    </div>
+                    <div style="flex: 1; font-size: 11px; line-height: 1.45; color: #1e293b; overflow: hidden;">
+                        <div style="font-size: 14px; font-weight: 700; color: #0a2540; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(t.name)}</div>
+                        <div style="display: grid; grid-template-columns: 78px 1fr; gap: 1px 4px;">
+                            <span style="color: #64748b; font-weight: 600;">Designation</span>
+                            <span style="font-weight: 600;">Teacher</span>
+                            <span style="color: #64748b; font-weight: 600;">Subjects</span>
+                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(subjects)}</span>
+                            <span style="color: #64748b; font-weight: 600;">Classes</span>
+                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(classes)}</span>
+                            <span style="color: #64748b; font-weight: 600;">Staff ID</span>
+                            <span style="font-weight: 600;">${App.escapeHtml(t.id)}</span>
+                            <span style="color: #64748b; font-weight: 600;">Phone</span>
+                            <span style="font-weight: 600;">${App.escapeHtml(t.phone || '-')}</span>
+                            <span style="color: #64748b; font-weight: 600;">Joining</span>
+                            <span style="font-weight: 600;">${t.joiningDate ? App.formatDate(t.joiningDate) : '-'}</span>
+                        </div>
+                    </div>
+                    <div style="flex-shrink: 0; text-align: center; width: 55px;">
+                        <div style="
+                            width: 50px; height: 50px;
+                            background: #fff;
+                            border: 1px solid #cbd5e1;
+                            border-radius: 4px;
+                            display: flex; align-items: center; justify-content: center;
+                            flex-direction: column;
+                        ">
+                            <i class="fas fa-qrcode" style="font-size: 28px; color: #0a2540;"></i>
+                        </div>
+                        <div style="font-size: 7px; color: #64748b; margin-top: 3px; word-break: break-all; line-height: 1.2;">${App.escapeHtml((t.id || '').replace('TCH_', ''))}</div>
+                    </div>
+                </div>
+                <div style="
+                    position: absolute; bottom: 0; left: 0; right: 0;
+                    background: #0a2540; color: #fff;
+                    padding: 4px 12px; font-size: 8px;
+                    display: flex; justify-content: space-between; align-items: center;
+                ">
+                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03168122916')}</span>
+                    <span style="color:#d4a017; font-weight: 600;">AUTHORIZED STAFF</span>
+                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(t.whatsapp || settings.whatsapp || '03168122916')}</span>
+                </div>
+            </div>`;
+        }
+        function generateTeacherIDCard() {
+            const id = document.getElementById('idcard-teacher').value;
+            const t = Teachers.getTeacherById(id);
+            if (!t) { App.showToast('Please select a teacher', 'warning'); return; }
+            const settings = DB.getSettings();
+            document.getElementById('idcard-preview').innerHTML = buildTeacherIDCardHTML(t, settings);
+            App.showToast('Teacher ID Card generated for ' + t.name, 'success');
+        }
+        function generateAllTeacherIDCards() {
+            const teachers = Teachers.getTeachers().filter(t => t.status === 'Active');
+            if (teachers.length === 0) { App.showToast('No active teachers found', 'warning'); return; }
+            const settings = DB.getSettings();
+            document.getElementById('idcard-preview').innerHTML = teachers.map(t => buildTeacherIDCardHTML(t, settings)).join('');
+            App.showToast(teachers.length + ' Teacher ID Cards generated', 'success');
+        }
         function initCertSelect() {
             const sel = document.getElementById('cert-student');
             sel.innerHTML = '<option value="">Select Student</option>' + Students.getStudents().map(s => `<option value="${s.id}">${s.name} - ${s.className}</option>`).join('');
