@@ -1,4 +1,4 @@
-// database.js - LocalStorage Database Layer for AL Muneer Ahmed Public School
+// database.js - LocalStorage Database Layer for The Smart Modern Public School
 
 const DB_PREFIX = 'school_';
 
@@ -105,12 +105,12 @@ function saveSettings(settings) {
 
 function getDefaultSettings() {
     return {
-        schoolName: 'AL Muneer Ahmed Public School',
+        schoolName: 'The Smart Modern Public School',
         tagline: 'Quality Education, Bright Future',
         whatsapp: '03168122916',
         whatsappIntl: '923168122916',
         phone: '03168122916',
-        email: 'info@almuneerahmed.edu.pk',
+        email: 'info@thesmartmodern.edu.pk',
         address: 'Pakistan',
         logo: 'assets/logo.png',
         academicSession: '2025-2026',

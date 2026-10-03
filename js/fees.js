@@ -122,7 +122,7 @@ function renderFeeDefaultersTable(containerId) {
     defaulters.forEach((item, i) => {
         const s = item.student;
         const f = item.fee;
-        const msg = `Assalam-o-Alaikum. This is a fee reminder from AL Muneer Ahmed Public School. Your child ${s.name} (${s.className}) has pending fee of ${App.formatCurrency(f.remaining)} for ${f.month}. Please clear the dues at the earliest. Thank you.`;
+        const msg = `Assalam-o-Alaikum. This is a fee reminder from The Smart Modern Public School. Your child ${s.name} (${s.className}) has pending fee of ${App.formatCurrency(f.remaining)} for ${f.month}. Please clear the dues at the earliest. Thank you.`;
         html += `<tr>
             <td>${i + 1}</td>
             <td><strong>${App.escapeHtml(s.name)}</strong></td>
