@@ -1,8 +1,8 @@
-# AL Muneer Ahmed Public School - School Management System
+# The Smart Modern Public School - School Management System
 
 A complete, professional School Management System built with **HTML5, CSS3, and Vanilla JavaScript**. Uses LocalStorage for data persistence. No backend required.
 
-**School:** AL Muneer Ahmed Public School  
+**School:** The Smart Modern Public School  
 **Tagline:** Quality Education, Bright Future  
 **WhatsApp:** 03168122916 (International: 923168122916)
 
@@ -117,7 +117,7 @@ assets/logo.png
 ```
 
 Recommended size: 200x200 px (PNG with transparent background).  
-If the file is missing, a fallback "AMA" badge is shown automatically.
+If the file is missing, a fallback "SMP" badge is shown automatically.
 
 ---
 
@@ -184,5 +184,5 @@ Requires JavaScript and LocalStorage enabled.
 
 ## License
 
-Demo system for AL Muneer Ahmed Public School.  
+Demo system for The Smart Modern Public School.  
 Built with HTML, CSS & Vanilla JavaScript.
