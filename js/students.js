@@ -133,6 +133,7 @@ function renderStudentsTable(containerId, options = {}) {
                 <td class="actions">
                     <button class="btn-icon view" onclick="viewStudent('${s.id}')" title="View"><i class="fas fa-eye"></i></button>
                     <button class="btn-icon edit" onclick="editStudent('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon" onclick="quickIDCard('${s.id}')" title="ID Card" style="color:#0a2540;"><i class="fas fa-id-card"></i></button>
                     <button class="btn-icon whatsapp" onclick="WhatsApp.openParentWhatsApp(getStudentById('${s.id}'))" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
                     <button class="btn-icon delete" onclick="confirmDeleteStudent('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button>
                 </td>
