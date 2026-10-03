@@ -186,7 +186,7 @@ function toggleTheme() {
     showToast(`Switched to ${next} mode`, 'success');
 }
 
-// Sidebar toggle for mobile
+// Sidebar toggle for mobile (slide in/out)
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
@@ -196,7 +196,18 @@ function toggleSidebar() {
     }
 }
 
-// Close sidebar on mobile when clicking a link
+// Desktop: collapse sidebar to icons only (hide/show school name + labels)
+function toggleSidebarCollapse() {
+    const sidebar = document.querySelector('.sidebar');
+    const main = document.querySelector('.main-content');
+    if (!sidebar) return;
+    sidebar.classList.toggle('collapsed');
+    if (main) main.classList.toggle('sidebar-collapsed');
+    const collapsed = sidebar.classList.contains('collapsed');
+    localStorage.setItem('school_sidebar_collapsed', collapsed ? '1' : '0');
+}
+
+// Close sidebar on mobile when clicking a link; restore collapse preference
 function initSidebar() {
     const links = document.querySelectorAll('.sidebar-nav a');
     links.forEach(link => {
@@ -206,6 +217,13 @@ function initSidebar() {
             }
         });
     });
+    // Restore desktop collapsed state
+    if (window.innerWidth > 768 && localStorage.getItem('school_sidebar_collapsed') === '1') {
+        const sidebar = document.querySelector('.sidebar');
+        const main = document.querySelector('.main-content');
+        if (sidebar) sidebar.classList.add('collapsed');
+        if (main) main.classList.add('sidebar-collapsed');
+    }
 }
 
 // Modal helpers
@@ -358,6 +376,7 @@ window.App = {
     initTheme,
     toggleTheme,
     toggleSidebar,
+    toggleSidebarCollapse,
     openModal,
     closeModal,
     paginate,

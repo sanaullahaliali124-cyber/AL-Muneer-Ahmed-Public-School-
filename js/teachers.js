@@ -66,6 +66,7 @@ function renderTeachersTable(containerId, options = {}) {
             <td class="actions">
                 <button class="btn-icon view" onclick="viewTeacher('${t.id}')" title="View"><i class="fas fa-eye"></i></button>
                 <button class="btn-icon edit" onclick="editTeacher('${t.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                <button class="btn-icon" onclick="quickTeacherIDCard('${t.id}')" title="ID Card" style="color:#0a2540;"><i class="fas fa-id-card"></i></button>
                 <button class="btn-icon whatsapp" onclick="WhatsApp.openTeacherWhatsApp(getTeacherById('${t.id}'))" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
                 <button class="btn-icon delete" onclick="confirmDeleteTeacher('${t.id}')" title="Delete"><i class="fas fa-trash"></i></button>
             </td>
