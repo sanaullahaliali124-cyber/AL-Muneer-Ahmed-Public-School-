@@ -1069,3 +1069,17 @@
 .show-sidebar-btn i {
     font-size: 1rem;
 }
+
+.chart-type-select {
+    padding: 5px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+.panel-header {
+    flex-wrap: wrap;
+    gap: 8px;
+}
