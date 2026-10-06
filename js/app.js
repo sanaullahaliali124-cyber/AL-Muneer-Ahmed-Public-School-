@@ -186,45 +186,119 @@ function toggleTheme() {
     showToast(`Switched to ${next} mode`, 'success');
 }
 
-// Sidebar toggle for mobile (slide in/out)
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
+// Fully HIDE left menu
+function hideSidebarMenu(save = true) {
+    const sidebar = document.querySelector('.sidebar') || document.getElementById('sidebar');
+    const main = document.querySelector('.main-content');
+    const showBtn = document.getElementById('show-sidebar-btn');
     const overlay = document.querySelector('.sidebar-overlay');
-    if (sidebar) {
-        sidebar.classList.toggle('open');
-        if (overlay) overlay.classList.toggle('active');
+    if (!sidebar) return;
+    sidebar.classList.add('menu-hidden');
+    sidebar.classList.remove('open', 'collapsed');
+    if (main) {
+        main.classList.add('menu-hidden');
+        main.classList.remove('sidebar-collapsed');
+    }
+    if (showBtn) showBtn.style.display = 'flex';
+    if (overlay) overlay.classList.remove('active');
+    if (save) {
+        localStorage.setItem('school_sidebar_menu', 'hide');
+        try {
+            const settings = typeof DB !== 'undefined' ? DB.getSettings() : null;
+            if (settings) {
+                settings.sidebarMenu = 'hide';
+                DB.saveSettings(settings);
+            }
+        } catch (e) {}
+        const sel = document.getElementById('setting-sidebarMenu');
+        if (sel) sel.value = 'hide';
     }
 }
 
-// Desktop: collapse sidebar to icons only (hide/show school name + labels)
-function toggleSidebarCollapse() {
-    const sidebar = document.querySelector('.sidebar');
+// Fully SHOW left menu
+function showSidebarMenu(save = true) {
+    const sidebar = document.querySelector('.sidebar') || document.getElementById('sidebar');
     const main = document.querySelector('.main-content');
+    const showBtn = document.getElementById('show-sidebar-btn');
     if (!sidebar) return;
-    sidebar.classList.toggle('collapsed');
-    if (main) main.classList.toggle('sidebar-collapsed');
-    const collapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('school_sidebar_collapsed', collapsed ? '1' : '0');
+    sidebar.classList.remove('menu-hidden', 'collapsed');
+    if (main) {
+        main.classList.remove('menu-hidden', 'sidebar-collapsed');
+    }
+    if (showBtn) showBtn.style.display = 'none';
+    // Mobile: open drawer
+    if (window.innerWidth <= 768) {
+        sidebar.classList.add('open');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (overlay) overlay.classList.add('active');
+    }
+    if (save) {
+        localStorage.setItem('school_sidebar_menu', 'show');
+        try {
+            const settings = typeof DB !== 'undefined' ? DB.getSettings() : null;
+            if (settings) {
+                settings.sidebarMenu = 'show';
+                DB.saveSettings(settings);
+            }
+        } catch (e) {}
+        const sel = document.getElementById('setting-sidebarMenu');
+        if (sel) sel.value = 'show';
+    }
 }
 
-// Close sidebar on mobile when clicking a link; restore collapse preference
+// Sidebar toggle for mobile (slide in/out) + topbar hamburger
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar') || document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (!sidebar) return;
+    // If fully hidden, show it
+    if (sidebar.classList.contains('menu-hidden')) {
+        showSidebarMenu(true);
+        return;
+    }
+    if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active', sidebar.classList.contains('open'));
+        return;
+    }
+    // Desktop: toggle full hide/show
+    if (sidebar.classList.contains('menu-hidden')) showSidebarMenu(true);
+    else hideSidebarMenu(true);
+}
+
+// Keep old name working
+function toggleSidebarCollapse() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar && sidebar.classList.contains('menu-hidden')) showSidebarMenu(true);
+    else hideSidebarMenu(true);
+}
+
 function initSidebar() {
     const links = document.querySelectorAll('.sidebar-nav a');
     links.forEach(link => {
         link.addEventListener('click', () => {
             if (window.innerWidth <= 768) {
-                toggleSidebar();
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) sidebar.classList.remove('open');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (overlay) overlay.classList.remove('active');
             }
         });
     });
-    // Restore desktop collapsed state
-    if (window.innerWidth > 768 && localStorage.getItem('school_sidebar_collapsed') === '1') {
-        const sidebar = document.querySelector('.sidebar');
-        const main = document.querySelector('.main-content');
-        if (sidebar) sidebar.classList.add('collapsed');
-        if (main) main.classList.add('sidebar-collapsed');
+    // Apply saved menu visibility
+    const mode = localStorage.getItem('school_sidebar_menu') || 'show';
+    if (mode === 'hide') {
+        hideSidebarMenu(false);
+    } else {
+        showSidebarMenu(false);
     }
 }
+
+// Global access for HTML onclick
+window.toggleSidebar = toggleSidebar;
+window.toggleSidebarCollapse = toggleSidebarCollapse;
+window.hideSidebarMenu = hideSidebarMenu;
+window.showSidebarMenu = showSidebarMenu;
 
 // Modal helpers
 function openModal(modalId) {
@@ -377,6 +451,8 @@ window.App = {
     toggleTheme,
     toggleSidebar,
     toggleSidebarCollapse,
+    hideSidebarMenu,
+    showSidebarMenu,
     openModal,
     closeModal,
     paginate,
