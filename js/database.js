@@ -107,9 +107,9 @@ function getDefaultSettings() {
     return {
         schoolName: 'The Smart Modern Public School',
         tagline: 'Quality Education, Bright Future',
-        whatsapp: '03168122916',
-        whatsappIntl: '923168122916',
-        phone: '03168122916',
+        whatsapp: '03304886710',
+        whatsappIntl: '923304886710',
+        phone: '03304886710',
         email: 'info@thesmartmodern.edu.pk',
         address: 'Pakistan',
         logo: 'assets/logo.png',

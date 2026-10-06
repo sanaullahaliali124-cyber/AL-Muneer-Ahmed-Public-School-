@@ -32,7 +32,7 @@ function openWhatsApp(number, message = '') {
 
 function getSchoolWhatsApp() {
     const settings = DB.getSettings();
-    return settings.whatsappIntl || '923168122916';
+    return settings.whatsappIntl || '923304886710';
 }
 
 function openSchoolWhatsApp(message = '') {

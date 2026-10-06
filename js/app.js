@@ -222,17 +222,22 @@ function showSidebarMenu(save = true) {
     const showBtn = document.getElementById('show-sidebar-btn');
     if (!sidebar) return;
     sidebar.classList.remove('menu-hidden', 'collapsed');
+    sidebar.style.transform = '';
+    sidebar.style.pointerEvents = '';
     if (main) {
         main.classList.remove('menu-hidden', 'sidebar-collapsed');
+        main.style.marginLeft = '';
     }
     if (showBtn) showBtn.style.display = 'none';
-    // Mobile: open drawer
+    // Mobile: open drawer so menu is visible on settings page too
     if (window.innerWidth <= 768) {
         sidebar.classList.add('open');
         const overlay = document.querySelector('.sidebar-overlay');
         if (overlay) overlay.classList.add('active');
+    } else {
+        sidebar.classList.remove('open');
     }
-    if (save) {
+    if (save !== false) {
         localStorage.setItem('school_sidebar_menu', 'show');
         try {
             const settings = typeof DB !== 'undefined' ? DB.getSettings() : null;
@@ -243,6 +248,9 @@ function showSidebarMenu(save = true) {
         } catch (e) {}
         const sel = document.getElementById('setting-sidebarMenu');
         if (sel) sel.value = 'show';
+    }
+    if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Menu shown', 'success', 1500);
     }
 }
 
