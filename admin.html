@@ -19,7 +19,7 @@
                 <h2>The Smart Modern Public School</h2>
                 <span>Quality Education, Bright Future</span>
             </div>
-            <button type="button" class="sidebar-collapse-btn" onclick="App.toggleSidebarCollapse()" title="Hide / Show Sidebar">
+            <button type="button" class="sidebar-collapse-btn" onclick="hideSidebarMenu(); return false;" title="Hide Menu">
                 <i class="fas fa-angles-left"></i>
             </button>
         </div>
@@ -62,6 +62,11 @@
             </div>
         </div>
     </aside>
+
+    <!-- Show menu button when sidebar is fully hidden -->
+    <button type="button" id="show-sidebar-btn" class="show-sidebar-btn" onclick="showSidebarMenu(); return false;" title="Show Menu" style="display:none;">
+        <i class="fas fa-bars"></i> Menu
+    </button>
 
     <div class="main-content">
         <div class="topbar">
@@ -482,7 +487,23 @@
                             <div class="form-group"><label>Academic Session</label><input type="text" id="setting-academicSession"></div>
                         </div>
                         <div class="form-group"><label>Address</label><input type="text" id="setting-address"></div>
-                        <div style="margin-top:20px;display:flex;gap:10px;">
+                        <hr style="margin:24px 0;border:none;border-top:1px solid var(--border-color);">
+                        <h3 style="font-size:1rem;margin-bottom:12px;"><i class="fas fa-bars"></i> Menu Display</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Sidebar Menu</label>
+                                <select id="setting-sidebarMenu">
+                                    <option value="show">Show Menu</option>
+                                    <option value="hide">Hide Menu</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="showSidebarMenu()"><i class="fas fa-eye"></i> Show Now</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="hideSidebarMenu()"><i class="fas fa-eye-slash"></i> Hide Now</button>
+                            </div>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Hide Menu = poori left menu band. Show ke liye top-left Menu button ya yahan se Show use karein.</p>
+                        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
                             <button class="btn btn-primary" onclick="Settings.saveSettingsForm()"><i class="fas fa-save"></i> Save Settings</button>
                             <button class="btn btn-danger" onclick="Settings.resetDemoData()"><i class="fas fa-trash-restore"></i> Reset Demo Data</button>
                         </div>
