@@ -583,10 +583,68 @@
                 </div>
                 <div class="form-group"><label>Address</label><textarea id="s-address"></textarea></div>
                 <div class="form-group"><label>Previous School</label><input type="text" id="s-previous"></div>
+                <div class="form-row" style="align-items:center;margin-top:12px;">
+                    <div class="form-group">
+                        <label>Student Photo (ID Card)</label>
+                        <input type="file" id="s-photo-file" accept="image/*" onchange="previewStudentPhoto(this)">
+                        <input type="hidden" id="s-photo">
+                        <small style="color:var(--text-secondary);">JPG/PNG, max ~500KB recommended</small>
+                    </div>
+                    <div class="form-group" style="text-align:center;">
+                        <div id="s-photo-preview" style="width:90px;height:110px;border:2px solid #d4a017;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;color:#94a3b8;">
+                            <i class="fas fa-user" style="font-size:28px;"></i>
+                        </div>
+                        <div><button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="clearStudentPhoto()">Remove Photo</button></div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="App.closeModal('student-modal')">Cancel</button>
                 <button class="btn btn-primary" onclick="saveStudent()"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add/Edit Teacher Modal -->
+    <div class="modal" id="teacher-modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header"><h2 id="teacher-modal-title">Add Teacher</h2><button class="modal-close" onclick="App.closeModal('teacher-modal')">&times;</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="teacher-edit-id">
+                <div class="form-row">
+                    <div class="form-group"><label>Teacher Name *</label><input type="text" id="t-name" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" id="t-phone"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>WhatsApp</label><input type="text" id="t-whatsapp"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="t-email"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Qualification</label><input type="text" id="t-qualification"></div>
+                    <div class="form-group"><label>Subjects (comma separated)</label><input type="text" id="t-subjects"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Classes (comma separated)</label><input type="text" id="t-classes"></div>
+                    <div class="form-group"><label>Joining Date</label><input type="date" id="t-joining"></div>
+                </div>
+                <div class="form-row" style="align-items:center;">
+                    <div class="form-group">
+                        <label>Teacher Photo (ID Card)</label>
+                        <input type="file" id="t-photo-file" accept="image/*" onchange="previewTeacherPhoto(this)">
+                        <input type="hidden" id="t-photo">
+                    </div>
+                    <div class="form-group" style="text-align:center;">
+                        <div id="t-photo-preview" style="width:90px;height:110px;border:2px solid #d4a017;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;color:#94a3b8;">
+                            <i class="fas fa-chalkboard-teacher" style="font-size:28px;"></i>
+                        </div>
+                        <div><button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="clearTeacherPhoto()">Remove Photo</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal('teacher-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTeacher()"><i class="fas fa-save"></i> Save</button>
             </div>
         </div>
     </div>
@@ -998,11 +1056,48 @@
             </tbody></table></div>`;
         }
 
+        // Photo helpers
+        function setPhotoPreview(previewId, dataUrl, iconClass) {
+            const box = document.getElementById(previewId);
+            if (!box) return;
+            if (dataUrl) {
+                box.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+            } else {
+                box.innerHTML = '<i class="fas ' + (iconClass || 'fa-user') + '" style="font-size:28px;"></i>';
+            }
+        }
+        function readPhotoFile(input, hiddenId, previewId, iconClass) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            if (file.size > 800000) { App.showToast('Photo too large. Use under 800KB', 'warning'); input.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                document.getElementById(hiddenId).value = dataUrl;
+                setPhotoPreview(previewId, dataUrl, iconClass);
+            };
+            reader.readAsDataURL(file);
+        }
+        function previewStudentPhoto(input) { readPhotoFile(input, 's-photo', 's-photo-preview', 'fa-user'); }
+        function clearStudentPhoto() {
+            document.getElementById('s-photo').value = '';
+            const f = document.getElementById('s-photo-file'); if (f) f.value = '';
+            setPhotoPreview('s-photo-preview', '', 'fa-user');
+        }
+        function previewTeacherPhoto(input) { readPhotoFile(input, 't-photo', 't-photo-preview', 'fa-chalkboard-teacher'); }
+        function clearTeacherPhoto() {
+            document.getElementById('t-photo').value = '';
+            const f = document.getElementById('t-photo-file'); if (f) f.value = '';
+            setPhotoPreview('t-photo-preview', '', 'fa-chalkboard-teacher');
+        }
+
         // Student CRUD
         function openAddStudentModal() {
             document.getElementById('student-modal-title').textContent = 'Add Student';
             document.getElementById('student-edit-id').value = '';
-            ['s-name','s-father','s-mother','s-dob','s-roll','s-phone','s-whatsapp','s-address','s-previous'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+            ['s-name','s-father','s-mother','s-dob','s-roll','s-phone','s-whatsapp','s-address','s-previous','s-photo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+            const pf = document.getElementById('s-photo-file'); if (pf) pf.value = '';
+            setPhotoPreview('s-photo-preview', '', 'fa-user');
             const classSel = document.getElementById('s-class');
             classSel.innerHTML = DB.getRecords(DB.keys.classes).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             App.openModal('student-modal');
@@ -1022,6 +1117,7 @@
                 parentWhatsapp: document.getElementById('s-whatsapp').value,
                 address: document.getElementById('s-address').value,
                 previousSchool: document.getElementById('s-previous').value,
+                photo: document.getElementById('s-photo').value || '',
                 status: 'Active'
             };
             if (!data.name || !data.fatherName) { App.showToast('Name and Father Name required', 'error'); return; }
@@ -1048,6 +1144,9 @@
             document.getElementById('s-whatsapp').value = s.parentWhatsapp || '';
             document.getElementById('s-address').value = s.address || '';
             document.getElementById('s-previous').value = s.previousSchool || '';
+            document.getElementById('s-photo').value = s.photo || '';
+            const pf = document.getElementById('s-photo-file'); if (pf) pf.value = '';
+            setPhotoPreview('s-photo-preview', s.photo || '', 'fa-user');
             App.openModal('student-modal');
         }
         function viewStudent(id) { editStudent(id); }
@@ -1086,11 +1185,62 @@
             App.confirmDialog('Delete this homework?', () => { Homework.deleteHomework(id); App.showToast('Deleted', 'success'); Homework.renderHomeworkList('homework-list'); });
         }
         function viewTeacher(id) { App.showToast('Teacher: ' + (Teachers.getTeacherById(id)?.name || id), 'info'); }
-        function editTeacher(id) { App.showToast('Edit teacher - use similar modal pattern', 'info'); }
+        function editTeacher(id) {
+            const te = Teachers.getTeacherById ? Teachers.getTeacherById(id) : DB.getRecords(DB.keys.teachers).find(x => x.id === id);
+            if (!te) return;
+            document.getElementById('teacher-modal-title').textContent = 'Edit Teacher';
+            document.getElementById('teacher-edit-id').value = id;
+            document.getElementById('t-name').value = te.name || '';
+            document.getElementById('t-phone').value = te.phone || '';
+            document.getElementById('t-whatsapp').value = te.whatsapp || '';
+            document.getElementById('t-email').value = te.email || '';
+            document.getElementById('t-qualification').value = te.qualification || '';
+            document.getElementById('t-subjects').value = Array.isArray(te.subjects) ? te.subjects.join(', ') : (te.subjects || '');
+            document.getElementById('t-classes').value = Array.isArray(te.classes) ? te.classes.join(', ') : (te.classes || '');
+            document.getElementById('t-joining').value = te.joiningDate || '';
+            document.getElementById('t-photo').value = te.photo || '';
+            const pf = document.getElementById('t-photo-file'); if (pf) pf.value = '';
+            setPhotoPreview('t-photo-preview', te.photo || '', 'fa-chalkboard-teacher');
+            App.openModal('teacher-modal');
+        }
         function viewParent(id) { App.showToast('Parent: ' + (Parents.getParentById(id)?.fatherName || id), 'info'); }
         function editParent(id) { App.showToast('Edit parent', 'info'); }
         function openAddParentModal() { App.showToast('Add parent form - data can be added via students linking', 'info'); }
-        function openAddTeacherModal() { App.showToast('Add teacher - use demo data or extend form', 'info'); }
+        function openAddTeacherModal() {
+            document.getElementById('teacher-modal-title').textContent = 'Add Teacher';
+            document.getElementById('teacher-edit-id').value = '';
+            ['t-name','t-phone','t-whatsapp','t-email','t-qualification','t-subjects','t-classes','t-joining','t-photo'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            const pf = document.getElementById('t-photo-file'); if (pf) pf.value = '';
+            setPhotoPreview('t-photo-preview', '', 'fa-chalkboard-teacher');
+            App.openModal('teacher-modal');
+        }
+        function saveTeacher() {
+            const id = document.getElementById('teacher-edit-id').value;
+            const data = {
+                name: document.getElementById('t-name').value,
+                phone: document.getElementById('t-phone').value,
+                whatsapp: document.getElementById('t-whatsapp').value,
+                email: document.getElementById('t-email').value,
+                qualification: document.getElementById('t-qualification').value,
+                subjects: (document.getElementById('t-subjects').value || '').split(',').map(x => x.trim()).filter(Boolean),
+                classes: (document.getElementById('t-classes').value || '').split(',').map(x => x.trim()).filter(Boolean),
+                joiningDate: document.getElementById('t-joining').value,
+                photo: document.getElementById('t-photo').value || '',
+                status: 'Active'
+            };
+            if (!data.name) { App.showToast('Teacher name required', 'error'); return; }
+            if (id) {
+                if (Teachers.updateTeacher) Teachers.updateTeacher(id, data);
+                else DB.updateRecord(DB.keys.teachers, id, data);
+                App.showToast('Teacher updated', 'success');
+            } else {
+                if (Teachers.addTeacher) Teachers.addTeacher(data);
+                else DB.addRecord(DB.keys.teachers, data);
+                App.showToast('Teacher added', 'success');
+            }
+            App.closeModal('teacher-modal');
+            loadTeachers();
+        }
         function openAddFeeModal() { App.showToast('Add fee payment - select student and enter amounts', 'info'); }
         function openAddExamModal() { App.showToast('Add exam form', 'info'); }
         function openAddHomeworkModal() { App.showToast('Add homework form', 'info'); }
@@ -1147,94 +1297,59 @@
         }
         function buildStudentIDCardHTML(s, settings) {
             const session = settings.academicSession || '2025-2026';
-            const initial = (s.name || 'S').charAt(0).toUpperCase();
             const genderIcon = s.gender === 'Female' ? 'fa-female' : 'fa-male';
+            const photoBlock = s.photo
+                ? `<img src="${s.photo}" alt="Photo" style="width:100%;height:100%;object-fit:cover;display:block;">`
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0a2540,#1a3a5c);color:#d4a017;font-size:42px;"><i class="fas ${genderIcon}"></i></div>`;
             return `
             <div class="student-id-card" style="
-                width: 340px;
-                height: 215px;
-                background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-                border: 2px solid #0a2540;
-                border-radius: 12px;
+                width: 240px;
+                height: 380px;
+                background: #fff;
+                border: 3px solid #0a2540;
+                border-radius: 14px;
                 overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.18);
                 position: relative;
                 font-family: 'Segoe UI', Arial, sans-serif;
                 page-break-inside: avoid;
                 display: inline-block;
-                margin: 5px;
+                margin: 8px;
+                vertical-align: top;
             ">
-                <!-- Top Header Bar -->
-                <div style="background: linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%); padding: 8px 12px; display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #d4a017; display: flex; align-items: center; justify-content: center; color: #0a2540; font-weight: 800; font-size: 12px; border: 2px solid #fff; flex-shrink: 0;">SMP</div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="color: #fff; font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(settings.schoolName)}</div>
-                        <div style="color: #d4a017; font-size: 9px; font-weight: 600;">STUDENT IDENTITY CARD</div>
-                    </div>
-                    <div style="color: #d4a017; font-size: 8px; text-align: right; line-height: 1.2;">
-                        Session<br><strong style="color:#fff;">${session}</strong>
-                    </div>
-                </div>
-                <!-- Body -->
-                <div style="display: flex; padding: 10px 12px; gap: 12px; height: calc(100% - 72px);">
-                    <!-- Photo -->
-                    <div style="flex-shrink: 0; text-align: center;">
-                        <div style="
-                            width: 75px; height: 90px;
-                            background: linear-gradient(160deg, #0a2540, #1a3a5c);
-                            border: 2px solid #d4a017;
-                            border-radius: 6px;
-                            display: flex; align-items: center; justify-content: center;
-                            color: #d4a017; font-size: 28px;
-                        "><i class="fas ${genderIcon}"></i></div>
-                        <div style="margin-top: 4px; font-size: 8px; color: #64748b; font-weight: 600;">PHOTO</div>
-                    </div>
-                    <!-- Details -->
-                    <div style="flex: 1; font-size: 11px; line-height: 1.45; color: #1e293b; overflow: hidden;">
-                        <div style="font-size: 14px; font-weight: 700; color: #0a2540; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(s.name)}</div>
-                        <div style="display: grid; grid-template-columns: 70px 1fr; gap: 1px 4px;">
-                            <span style="color: #64748b; font-weight: 600;">Father</span>
-                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(s.fatherName || '-')}</span>
-                            <span style="color: #64748b; font-weight: 600;">Class</span>
-                            <span style="font-weight: 600;">${App.escapeHtml(s.className || '-')} - ${App.escapeHtml(s.section || '')}</span>
-                            <span style="color: #64748b; font-weight: 600;">Roll No</span>
-                            <span style="font-weight: 600;">${App.escapeHtml(s.rollNo || '-')}</span>
-                            <span style="color: #64748b; font-weight: 600;">Adm No</span>
-                            <span style="font-weight: 600;">${App.escapeHtml(s.admissionNo || s.id)}</span>
-                            <span style="color: #64748b; font-weight: 600;">DOB</span>
-                            <span style="font-weight: 600;">${s.dob ? App.formatDate(s.dob) : '-'}</span>
-                            <span style="color: #64748b; font-weight: 600;">Blood</span>
-                            <span style="font-weight: 600;">${s.bloodGroup || 'N/A'}</span>
+                <div style="background: linear-gradient(135deg,#0a2540 0%,#1a3a5c 100%); padding: 12px 10px 10px; text-align: center; position: relative;">
+                    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#d4a017,#f5d76e,#d4a017);"></div>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#d4a017;display:flex;align-items:center;justify-content:center;color:#0a2540;font-weight:800;font-size:11px;border:2px solid #fff;">SMP</div>
+                        <div style="text-align:left;max-width:170px;">
+                            <div style="color:#fff;font-size:11px;font-weight:800;line-height:1.2;">${App.escapeHtml(settings.schoolName)}</div>
+                            <div style="color:#d4a017;font-size:8px;font-weight:600;letter-spacing:0.5px;">STUDENT ID CARD</div>
                         </div>
                     </div>
-                    <!-- QR / Code side -->
-                    <div style="flex-shrink: 0; text-align: center; width: 55px;">
-                        <div style="
-                            width: 50px; height: 50px;
-                            background: #fff;
-                            border: 1px solid #cbd5e1;
-                            border-radius: 4px;
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 8px; color: #94a3b8; flex-direction: column;
-                        ">
-                            <i class="fas fa-qrcode" style="font-size: 28px; color: #0a2540;"></i>
-                        </div>
-                        <div style="font-size: 7px; color: #64748b; margin-top: 3px; word-break: break-all; line-height: 1.2;">${App.escapeHtml((s.id || '').replace('STU_', ''))}</div>
+                    <div style="color:rgba(255,255,255,0.75);font-size:8px;">Session ${session}</div>
+                </div>
+                <div style="padding: 12px 14px 8px; text-align: center;">
+                    <div style="width: 110px; height: 130px; margin: 0 auto 10px; border: 3px solid #d4a017; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.12); background:#e2e8f0;">
+                        ${photoBlock}
+                    </div>
+                    <div style="font-size:15px;font-weight:800;color:#0a2540;line-height:1.2;margin-bottom:2px;">${App.escapeHtml(s.name)}</div>
+                    <div style="display:inline-block;background:#0a2540;color:#d4a017;font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:8px;">
+                        ${App.escapeHtml(s.className || '-')} · Sec ${App.escapeHtml(s.section || '-')} · Roll ${App.escapeHtml(s.rollNo || '-')}
+                    </div>
+                    <div style="text-align:left;font-size:10px;line-height:1.55;color:#1e293b;border-top:1px dashed #cbd5e1;padding-top:8px;">
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Father</span><span style="font-weight:700;text-align:right;">${App.escapeHtml(s.fatherName || '-')}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Adm No</span><span style="font-weight:700;">${App.escapeHtml(s.admissionNo || s.id)}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">D.O.B</span><span style="font-weight:700;">${s.dob ? App.formatDate(s.dob) : '-'}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Blood</span><span style="font-weight:700;">${s.bloodGroup || 'N/A'}</span></div>
                     </div>
                 </div>
-                <!-- Footer -->
-                <div style="
-                    position: absolute; bottom: 0; left: 0; right: 0;
-                    background: #0a2540; color: #fff;
-                    padding: 4px 12px; font-size: 8px;
-                    display: flex; justify-content: space-between; align-items: center;
-                ">
-                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</span>
-                    <span style="color:#d4a017; font-weight: 600;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</span>
-                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03304886710')}</span>
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#0a2540;color:#fff;padding:7px 10px;font-size:8px;text-align:center;">
+                    <div style="color:#d4a017;font-weight:700;margin-bottom:2px;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</div>
+                    <div><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03304886710')} &nbsp;|&nbsp; <i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</div>
                 </div>
             </div>`;
         }
+
         function generateIDCard() {
             const id = document.getElementById('idcard-student').value;
             const s = Students.getStudentById(id);
@@ -1269,13 +1384,13 @@
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { font-family: 'Segoe UI', Arial, sans-serif; padding: 10mm; background: #fff; }
-                        .print-grid { display: flex; flex-wrap: wrap; gap: 8mm; justify-content: center; }
-                        .student-id-card { break-inside: avoid; page-break-inside: avoid; }
+                        .print-grid { display: flex; flex-wrap: wrap; gap: 6mm; justify-content: center; align-items: flex-start; }
+                        .student-id-card, .teacher-id-card { break-inside: avoid; page-break-inside: avoid; }
                         @media print {
                             body { padding: 5mm; }
-                            .student-id-card { box-shadow: none !important; }
+                            .student-id-card, .teacher-id-card { box-shadow: none !important; }
                         }
-                        @page { size: A4; margin: 8mm; }
+                        @page { size: A4 portrait; margin: 8mm; }
                     </style>
                 </head>
                 <body>
@@ -1291,86 +1406,59 @@
             const session = settings.academicSession || '2025-2026';
             const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '-');
             const classes = Array.isArray(t.classes) ? t.classes.join(', ') : (t.classes || '-');
+            const photoBlock = t.photo
+                ? `<img src="${t.photo}" alt="Photo" style="width:100%;height:100%;object-fit:cover;display:block;">`
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0a2540,#d4a017);color:#fff;font-size:42px;"><i class="fas fa-chalkboard-teacher"></i></div>`;
             return `
             <div class="student-id-card teacher-id-card" style="
-                width: 340px;
-                height: 215px;
-                background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-                border: 2px solid #0a2540;
-                border-radius: 12px;
+                width: 240px;
+                height: 380px;
+                background: #fff;
+                border: 3px solid #0a2540;
+                border-radius: 14px;
                 overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.18);
                 position: relative;
                 font-family: 'Segoe UI', Arial, sans-serif;
                 page-break-inside: avoid;
                 display: inline-block;
-                margin: 5px;
+                margin: 8px;
+                vertical-align: top;
             ">
-                <div style="background: linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%); padding: 8px 12px; display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #d4a017; display: flex; align-items: center; justify-content: center; color: #0a2540; font-weight: 800; font-size: 12px; border: 2px solid #fff; flex-shrink: 0;">SMP</div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="color: #fff; font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(settings.schoolName)}</div>
-                        <div style="color: #d4a017; font-size: 9px; font-weight: 600;">STAFF / TEACHER IDENTITY CARD</div>
-                    </div>
-                    <div style="color: #d4a017; font-size: 8px; text-align: right; line-height: 1.2;">
-                        Session<br><strong style="color:#fff;">${session}</strong>
-                    </div>
-                </div>
-                <div style="display: flex; padding: 10px 12px; gap: 12px; height: calc(100% - 72px);">
-                    <div style="flex-shrink: 0; text-align: center;">
-                        <div style="
-                            width: 75px; height: 90px;
-                            background: linear-gradient(160deg, #0a2540, #d4a017);
-                            border: 2px solid #d4a017;
-                            border-radius: 6px;
-                            display: flex; align-items: center; justify-content: center;
-                            color: #fff; font-size: 28px;
-                        "><i class="fas fa-chalkboard-teacher"></i></div>
-                        <div style="margin-top: 4px; font-size: 8px; color: #64748b; font-weight: 600;">PHOTO</div>
-                    </div>
-                    <div style="flex: 1; font-size: 11px; line-height: 1.45; color: #1e293b; overflow: hidden;">
-                        <div style="font-size: 14px; font-weight: 700; color: #0a2540; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(t.name)}</div>
-                        <div style="display: grid; grid-template-columns: 78px 1fr; gap: 1px 4px;">
-                            <span style="color: #64748b; font-weight: 600;">Designation</span>
-                            <span style="font-weight: 600;">Teacher</span>
-                            <span style="color: #64748b; font-weight: 600;">Subjects</span>
-                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(subjects)}</span>
-                            <span style="color: #64748b; font-weight: 600;">Classes</span>
-                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${App.escapeHtml(classes)}</span>
-                            <span style="color: #64748b; font-weight: 600;">Staff ID</span>
-                            <span style="font-weight: 600;">${App.escapeHtml(t.id)}</span>
-                            <span style="color: #64748b; font-weight: 600;">Phone</span>
-                            <span style="font-weight: 600;">${App.escapeHtml(t.phone || '-')}</span>
-                            <span style="color: #64748b; font-weight: 600;">Joining</span>
-                            <span style="font-weight: 600;">${t.joiningDate ? App.formatDate(t.joiningDate) : '-'}</span>
+                <div style="background: linear-gradient(135deg,#0a2540 0%,#1a3a5c 100%); padding: 12px 10px 10px; text-align: center; position: relative;">
+                    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#d4a017,#f5d76e,#d4a017);"></div>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#d4a017;display:flex;align-items:center;justify-content:center;color:#0a2540;font-weight:800;font-size:11px;border:2px solid #fff;">SMP</div>
+                        <div style="text-align:left;max-width:170px;">
+                            <div style="color:#fff;font-size:11px;font-weight:800;line-height:1.2;">${App.escapeHtml(settings.schoolName)}</div>
+                            <div style="color:#d4a017;font-size:8px;font-weight:600;letter-spacing:0.5px;">STAFF / TEACHER ID CARD</div>
                         </div>
                     </div>
-                    <div style="flex-shrink: 0; text-align: center; width: 55px;">
-                        <div style="
-                            width: 50px; height: 50px;
-                            background: #fff;
-                            border: 1px solid #cbd5e1;
-                            border-radius: 4px;
-                            display: flex; align-items: center; justify-content: center;
-                            flex-direction: column;
-                        ">
-                            <i class="fas fa-qrcode" style="font-size: 28px; color: #0a2540;"></i>
-                        </div>
-                        <div style="font-size: 7px; color: #64748b; margin-top: 3px; word-break: break-all; line-height: 1.2;">${App.escapeHtml((t.id || '').replace('TCH_', ''))}</div>
+                    <div style="color:rgba(255,255,255,0.75);font-size:8px;">Session ${session}</div>
+                </div>
+                <div style="padding: 12px 14px 8px; text-align: center;">
+                    <div style="width: 110px; height: 130px; margin: 0 auto 10px; border: 3px solid #d4a017; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.12); background:#e2e8f0;">
+                        ${photoBlock}
+                    </div>
+                    <div style="font-size:15px;font-weight:800;color:#0a2540;line-height:1.2;margin-bottom:2px;">${App.escapeHtml(t.name)}</div>
+                    <div style="display:inline-block;background:#d4a017;color:#0a2540;font-size:9px;font-weight:800;padding:2px 12px;border-radius:20px;margin-bottom:8px;">
+                        TEACHER
+                    </div>
+                    <div style="text-align:left;font-size:10px;line-height:1.55;color:#1e293b;border-top:1px dashed #cbd5e1;padding-top:8px;">
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Staff ID</span><span style="font-weight:700;">${App.escapeHtml(t.id)}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Subjects</span><span style="font-weight:700;text-align:right;max-width:130px;">${App.escapeHtml(subjects)}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Classes</span><span style="font-weight:700;text-align:right;max-width:130px;">${App.escapeHtml(classes)}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Phone</span><span style="font-weight:700;">${App.escapeHtml(t.phone || '-')}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Joining</span><span style="font-weight:700;">${t.joiningDate ? App.formatDate(t.joiningDate) : '-'}</span></div>
                     </div>
                 </div>
-                <div style="
-                    position: absolute; bottom: 0; left: 0; right: 0;
-                    background: #0a2540; color: #fff;
-                    padding: 4px 12px; font-size: 8px;
-                    display: flex; justify-content: space-between; align-items: center;
-                ">
-                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</span>
-                    <span style="color:#d4a017; font-weight: 600;">AUTHORIZED STAFF</span>
-                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(t.whatsapp || settings.whatsapp || '03304886710')}</span>
+                <div style="position:absolute;bottom:0;left:0;right:0;background:#0a2540;color:#fff;padding:7px 10px;font-size:8px;text-align:center;">
+                    <div style="color:#d4a017;font-weight:700;margin-bottom:2px;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</div>
+                    <div><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03304886710')} &nbsp;|&nbsp; <i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</div>
                 </div>
             </div>`;
         }
+
         function generateTeacherIDCard() {
             const id = document.getElementById('idcard-teacher').value;
             const t = Teachers.getTeacherById(id);
