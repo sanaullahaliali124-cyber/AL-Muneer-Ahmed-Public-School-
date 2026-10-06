@@ -84,7 +84,7 @@
                     <i class="fas fa-bell"></i>
                     <span class="badge notification-badge">0</span>
                 </button>
-                <a href="https://wa.me/923168122916" target="_blank" class="topbar-btn" title="School WhatsApp" style="color:#25d366;"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://wa.me/923304886710" target="_blank" class="topbar-btn" title="School WhatsApp" style="color:#25d366;"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
 
@@ -94,13 +94,31 @@
                 <div class="stats-grid" id="stats-grid"></div>
                 <div class="grid-2">
                     <div class="panel">
-                        <div class="panel-header"><h2><i class="fas fa-chart-bar"></i> Students by Class</h2></div>
+                        <div class="panel-header">
+                            <h2><i class="fas fa-chart-bar"></i> Students by Class</h2>
+                            <select id="chart-type-students" class="chart-type-select" onchange="renderDashCharts()">
+                                <option value="bar">Columns</option>
+                                <option value="line">Line</option>
+                                <option value="pie">Pie</option>
+                                <option value="doughnut">Doughnut</option>
+                                <option value="polarArea">Polar</option>
+                            </select>
+                        </div>
                         <div class="panel-body" style="height:280px;position:relative;">
                             <canvas id="chart-students"></canvas>
                         </div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h2><i class="fas fa-chart-pie"></i> Today's Attendance</h2></div>
+                        <div class="panel-header">
+                            <h2><i class="fas fa-chart-pie"></i> Today's Attendance</h2>
+                            <select id="chart-type-attendance" class="chart-type-select" onchange="renderDashCharts()">
+                                <option value="doughnut">Doughnut</option>
+                                <option value="pie">Pie</option>
+                                <option value="bar">Columns</option>
+                                <option value="line">Line</option>
+                                <option value="polarArea">Polar</option>
+                            </select>
+                        </div>
                         <div class="panel-body" style="height:280px;position:relative;">
                             <canvas id="chart-attendance"></canvas>
                         </div>
@@ -108,13 +126,31 @@
                 </div>
                 <div class="grid-2" style="margin-top:0;">
                     <div class="panel">
-                        <div class="panel-header"><h2><i class="fas fa-money-bill-wave"></i> Fee Collection Status</h2></div>
+                        <div class="panel-header">
+                            <h2><i class="fas fa-money-bill-wave"></i> Fee Collection Status</h2>
+                            <select id="chart-type-fees" class="chart-type-select" onchange="renderDashCharts()">
+                                <option value="bar">Columns</option>
+                                <option value="line">Line</option>
+                                <option value="pie">Pie</option>
+                                <option value="doughnut">Doughnut</option>
+                                <option value="polarArea">Polar</option>
+                            </select>
+                        </div>
                         <div class="panel-body" style="height:280px;position:relative;">
                             <canvas id="chart-fees"></canvas>
                         </div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h2><i class="fas fa-venus-mars"></i> Gender Distribution</h2></div>
+                        <div class="panel-header">
+                            <h2><i class="fas fa-venus-mars"></i> Gender Distribution</h2>
+                            <select id="chart-type-gender" class="chart-type-select" onchange="renderDashCharts()">
+                                <option value="pie">Pie</option>
+                                <option value="doughnut">Doughnut</option>
+                                <option value="bar">Columns</option>
+                                <option value="line">Line</option>
+                                <option value="polarArea">Polar</option>
+                            </select>
+                        </div>
                         <div class="panel-body" style="height:280px;position:relative;">
                             <canvas id="chart-gender"></canvas>
                         </div>
@@ -498,8 +534,8 @@
                                 </select>
                             </div>
                             <div class="form-group" style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="showSidebarMenu()"><i class="fas fa-eye"></i> Show Now</button>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="hideSidebarMenu()"><i class="fas fa-eye-slash"></i> Hide Now</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="showSidebarMenu(true); return false;"><i class="fas fa-eye"></i> Show Now</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="hideSidebarMenu(true); return false;"><i class="fas fa-eye-slash"></i> Hide Now</button>
                             </div>
                         </div>
                         <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">Hide Menu = poori left menu band. Show ke liye top-left Menu button ya yahan se Show use karein.</p>
@@ -665,6 +701,165 @@
             }
         }
 
+        function getChartType(id, fallback) {
+            const el = document.getElementById(id);
+            const saved = localStorage.getItem('chart_' + id);
+            if (el && saved) {
+                el.value = saved;
+                return saved;
+            }
+            return el ? el.value : fallback;
+        }
+
+        function saveChartType(id) {
+            const el = document.getElementById(id);
+            if (el) localStorage.setItem('chart_' + id, el.value);
+        }
+
+        function chartColors(n) {
+            const base = ['#0a2540', '#d4a017', '#10b981', '#ef4444', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#14b8a6', '#6366f1'];
+            const out = [];
+            for (let i = 0; i < n; i++) out.push(base[i % base.length]);
+            return out;
+        }
+
+        function buildChartOptions(type, textColor, gridColor) {
+            const isRadial = type === 'pie' || type === 'doughnut' || type === 'polarArea';
+            const opts = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: isRadial || type === 'line',
+                        position: 'bottom',
+                        labels: { color: textColor, padding: 12, usePointStyle: true, font: { size: 11 } }
+                    },
+                    tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
+                }
+            };
+            if (!isRadial) {
+                opts.scales = {
+                    x: { ticks: { color: textColor, maxRotation: 45, font: { size: 10 } }, grid: { display: type === 'line', color: gridColor } },
+                    y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
+                };
+            }
+            if (type === 'doughnut') opts.cutout = '55%';
+            return opts;
+        }
+
+        function makeDataset(type, label, data, colors) {
+            const isRadial = type === 'pie' || type === 'doughnut' || type === 'polarArea';
+            if (isRadial) {
+                return {
+                    label: label,
+                    data: data,
+                    backgroundColor: colors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                };
+            }
+            if (type === 'line') {
+                return {
+                    label: label,
+                    data: data,
+                    borderColor: '#0a2540',
+                    backgroundColor: 'rgba(212, 160, 23, 0.2)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#d4a017',
+                    pointRadius: 4
+                };
+            }
+            // bar / columns
+            return {
+                label: label,
+                data: data,
+                backgroundColor: colors.length === data.length ? colors : '#0a2540',
+                borderColor: '#d4a017',
+                borderWidth: 1,
+                borderRadius: 6,
+                maxBarThickness: 48
+            };
+        }
+
+        function renderDashCharts() {
+            if (typeof Chart === 'undefined') return;
+
+            ['chart-type-students','chart-type-attendance','chart-type-fees','chart-type-gender'].forEach(saveChartType);
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(148,163,184,0.15)' : 'rgba(0,0,0,0.06)';
+
+            const students = Students.getStudents().filter(s => s.status === 'Active');
+            const classCounts = {};
+            students.forEach(s => { classCounts[s.className] = (classCounts[s.className] || 0) + 1; });
+            const classLabels = Object.keys(classCounts);
+            const classData = Object.values(classCounts);
+
+            let attRecords = DB.getRecords(DB.keys.attendance);
+            const today = new Date().toISOString().split('T')[0];
+            let dayRecords = attRecords.filter(a => a.date === today);
+            if (dayRecords.length === 0 && attRecords.length > 0) {
+                const latest = attRecords.map(a => a.date).sort().reverse()[0];
+                dayRecords = attRecords.filter(a => a.date === latest);
+            }
+            const presentN = dayRecords.filter(a => a.status === 'Present').length;
+            const absentN = dayRecords.filter(a => a.status === 'Absent').length;
+            const lateN = dayRecords.filter(a => a.status === 'Late').length;
+            const leaveN = dayRecords.filter(a => a.status === 'Leave').length;
+
+            const fees = DB.getRecords(DB.keys.fees);
+            const feePaid = fees.filter(f => f.status === 'Paid').length;
+            const feePartial = fees.filter(f => f.status === 'Partial').length;
+            const feePending = fees.filter(f => f.status === 'Pending').length;
+
+            const maleCount = students.filter(s => s.gender === 'Male').length;
+            const femaleCount = students.filter(s => s.gender === 'Female').length;
+
+            const charts = [
+                {
+                    key: 'students', canvas: 'chart-students', typeId: 'chart-type-students', fallback: 'bar',
+                    labels: classLabels, data: classData, label: 'Students',
+                    colors: chartColors(classLabels.length)
+                },
+                {
+                    key: 'attendance', canvas: 'chart-attendance', typeId: 'chart-type-attendance', fallback: 'doughnut',
+                    labels: ['Present', 'Absent', 'Late', 'Leave'],
+                    data: [presentN, absentN, lateN, leaveN], label: 'Attendance',
+                    colors: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6']
+                },
+                {
+                    key: 'fees', canvas: 'chart-fees', typeId: 'chart-type-fees', fallback: 'bar',
+                    labels: ['Paid', 'Partial', 'Pending'],
+                    data: [feePaid, feePartial, feePending], label: 'Fees',
+                    colors: ['#10b981', '#f59e0b', '#ef4444']
+                },
+                {
+                    key: 'gender', canvas: 'chart-gender', typeId: 'chart-type-gender', fallback: 'pie',
+                    labels: ['Male', 'Female'],
+                    data: [maleCount, femaleCount], label: 'Gender',
+                    colors: ['#3b82f6', '#ec4899']
+                }
+            ];
+
+            charts.forEach(c => {
+                const type = getChartType(c.typeId, c.fallback);
+                const el = document.getElementById(c.canvas);
+                if (!el) return;
+                destroyChart(c.key);
+                window._dashCharts[c.key] = new Chart(el, {
+                    type: type,
+                    data: {
+                        labels: c.labels,
+                        datasets: [makeDataset(type, c.label, c.data, c.colors)]
+                    },
+                    options: buildChartOptions(type, textColor, gridColor)
+                });
+            });
+        }
+
         function loadDashboard() {
             const stats = App.getDashboardStats();
             document.getElementById('stats-grid').innerHTML = `
@@ -685,154 +880,14 @@
                 return;
             }
 
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const textColor = isDark ? '#94a3b8' : '#64748b';
-            const gridColor = isDark ? 'rgba(148,163,184,0.15)' : 'rgba(0,0,0,0.06)';
-            const borderColor = isDark ? '#1e293b' : '#ffffff';
+            // restore saved chart types into selects
+            ['chart-type-students','chart-type-attendance','chart-type-fees','chart-type-gender'].forEach(id => {
+                const el = document.getElementById(id);
+                const saved = localStorage.getItem('chart_' + id);
+                if (el && saved) el.value = saved;
+            });
 
-            // Students by Class - Bar Chart
-            const students = Students.getStudents().filter(s => s.status === 'Active');
-            const classCounts = {};
-            students.forEach(s => { classCounts[s.className] = (classCounts[s.className] || 0) + 1; });
-            const classLabels = Object.keys(classCounts);
-            const classData = Object.values(classCounts);
-
-            destroyChart('students');
-            const elStudents = document.getElementById('chart-students');
-            if (elStudents) {
-                window._dashCharts.students = new Chart(elStudents, {
-                    type: 'bar',
-                    data: {
-                        labels: classLabels,
-                        datasets: [{
-                            label: 'Students',
-                            data: classData,
-                            backgroundColor: 'rgba(10, 37, 64, 0.85)',
-                            borderColor: '#d4a017',
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            maxBarThickness: 42
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
-                        },
-                        scales: {
-                            x: { ticks: { color: textColor, maxRotation: 45, font: { size: 10 } }, grid: { display: false } },
-                            y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
-                        }
-                    }
-                });
-            }
-
-            // Attendance - Doughnut (use today; if empty show last available date)
-            let attRecords = DB.getRecords(DB.keys.attendance);
-            const today = new Date().toISOString().split('T')[0];
-            let dayRecords = attRecords.filter(a => a.date === today);
-            if (dayRecords.length === 0 && attRecords.length > 0) {
-                const latest = attRecords.map(a => a.date).sort().reverse()[0];
-                dayRecords = attRecords.filter(a => a.date === latest);
-            }
-            const presentN = dayRecords.filter(a => a.status === 'Present').length;
-            const absentN = dayRecords.filter(a => a.status === 'Absent').length;
-            const lateN = dayRecords.filter(a => a.status === 'Late').length;
-            const leaveN = dayRecords.filter(a => a.status === 'Leave').length;
-
-            destroyChart('attendance');
-            const elAtt = document.getElementById('chart-attendance');
-            if (elAtt) {
-                window._dashCharts.attendance = new Chart(elAtt, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Present', 'Absent', 'Late', 'Leave'],
-                        datasets: [{
-                            data: [presentN || 0, absentN || 0, lateN || 0, leaveN || 0],
-                            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6'],
-                            borderWidth: 2,
-                            borderColor: borderColor
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { color: textColor, padding: 14, usePointStyle: true } },
-                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
-                        },
-                        cutout: '55%'
-                    }
-                });
-            }
-
-            // Fee Status - Bar
-            const fees = DB.getRecords(DB.keys.fees);
-            const feePaid = fees.filter(f => f.status === 'Paid').length;
-            const feePartial = fees.filter(f => f.status === 'Partial').length;
-            const feePending = fees.filter(f => f.status === 'Pending').length;
-
-            destroyChart('fees');
-            const elFees = document.getElementById('chart-fees');
-            if (elFees) {
-                window._dashCharts.fees = new Chart(elFees, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Paid', 'Partial', 'Pending'],
-                        datasets: [{
-                            label: 'Fee Records',
-                            data: [feePaid, feePartial, feePending],
-                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                            borderRadius: 8,
-                            maxBarThickness: 55
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
-                        },
-                        scales: {
-                            x: { ticks: { color: textColor }, grid: { display: false } },
-                            y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
-                        }
-                    }
-                });
-            }
-
-            // Gender - Pie
-            const maleCount = students.filter(s => s.gender === 'Male').length;
-            const femaleCount = students.filter(s => s.gender === 'Female').length;
-
-            destroyChart('gender');
-            const elGender = document.getElementById('chart-gender');
-            if (elGender) {
-                window._dashCharts.gender = new Chart(elGender, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Male', 'Female'],
-                        datasets: [{
-                            data: [maleCount, femaleCount],
-                            backgroundColor: ['#3b82f6', '#ec4899'],
-                            borderWidth: 2,
-                            borderColor: borderColor
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { color: textColor, padding: 14, usePointStyle: true } },
-                            tooltip: { backgroundColor: '#0a2540', titleColor: '#d4a017', bodyColor: '#fff' }
-                        }
-                    }
-                });
-            }
-
+            renderDashCharts();
             Notifications.renderNotifications('dash-notifications');
             Notifications.updateNotificationBadge();
         }
@@ -1174,9 +1229,9 @@
                     padding: 4px 12px; font-size: 8px;
                     display: flex; justify-content: space-between; align-items: center;
                 ">
-                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03168122916')}</span>
+                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</span>
                     <span style="color:#d4a017; font-weight: 600;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</span>
-                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03168122916')}</span>
+                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03304886710')}</span>
                 </div>
             </div>`;
         }
@@ -1310,9 +1365,9 @@
                     padding: 4px 12px; font-size: 8px;
                     display: flex; justify-content: space-between; align-items: center;
                 ">
-                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03168122916')}</span>
+                    <span><i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</span>
                     <span style="color:#d4a017; font-weight: 600;">AUTHORIZED STAFF</span>
-                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(t.whatsapp || settings.whatsapp || '03168122916')}</span>
+                    <span><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(t.whatsapp || settings.whatsapp || '03304886710')}</span>
                 </div>
             </div>`;
         }
