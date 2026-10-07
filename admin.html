@@ -1295,58 +1295,97 @@
                 `<option value="${s.id}">${s.name} - ${s.className} (${s.section})</option>`
             ).join('');
         }
+        function idBarcode(code) {
+            const src = String(code || '00000000');
+            let bars = '';
+            for (let i = 0; i < src.length; i++) {
+                const n = src.charCodeAt(i);
+                const w = 1 + (n % 3);
+                bars += `<span style="display:inline-block;width:${w}px;height:36px;background:#111;margin-right:1px;"></span>`;
+                bars += `<span style="display:inline-block;width:1px;height:36px;background:#fff;"></span>`;
+            }
+            return `<div style="display:flex;align-items:flex-end;justify-content:center;height:40px;background:#fff;padding:2px 8px;">${bars}</div>`;
+        }
+        function idQrBlock(code) {
+            const src = String(code || 'SMP');
+            let cells = '';
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 7; c++) {
+                    const on = ((src.charCodeAt((r + c) % src.length) + r * 3 + c) % 3) !== 0 || (r < 2 && c < 2) || (r < 2 && c > 4) || (r > 4 && c < 2);
+                    cells += `<span style="width:4px;height:4px;background:${on ? '#111' : '#fff'};display:block;"></span>`;
+                }
+            }
+            return `<div style="width:42px;height:42px;display:grid;grid-template-columns:repeat(7,4px);gap:1px;background:#fff;border:1px solid #e2e8f0;padding:2px;">${cells}</div>`;
+        }
+
         function buildStudentIDCardHTML(s, settings) {
             const session = settings.academicSession || '2025-2026';
-            const genderIcon = s.gender === 'Female' ? 'fa-female' : 'fa-male';
+            const school = settings.schoolName || 'The Smart Modern Public School';
             const photoBlock = s.photo
                 ? `<img src="${s.photo}" alt="Photo" style="width:100%;height:100%;object-fit:cover;display:block;">`
-                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0a2540,#1a3a5c);color:#d4a017;font-size:42px;"><i class="fas ${genderIcon}"></i></div>`;
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0a2540;color:#d4a017;font-size:42px;"><i class="fas fa-user"></i></div>`;
+            const adm = App.escapeHtml(s.admissionNo || s.id || '');
+            const grade = App.escapeHtml((s.className || '-') + (s.section ? ' - ' + s.section : ''));
+            const dob = s.dob ? App.formatDate(s.dob) : '-';
             return `
-            <div class="student-id-card" style="
-                width: 240px;
-                height: 380px;
-                background: #fff;
-                border: 3px solid #0a2540;
-                border-radius: 14px;
-                overflow: hidden;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-                position: relative;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                page-break-inside: avoid;
-                display: inline-block;
-                margin: 8px;
-                vertical-align: top;
-            ">
-                <div style="background: linear-gradient(135deg,#0a2540 0%,#1a3a5c 100%); padding: 12px 10px 10px; text-align: center; position: relative;">
-                    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#d4a017,#f5d76e,#d4a017);"></div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
-                        <div style="width:32px;height:32px;border-radius:50%;background:#d4a017;display:flex;align-items:center;justify-content:center;color:#0a2540;font-weight:800;font-size:11px;border:2px solid #fff;">SMP</div>
-                        <div style="text-align:left;max-width:170px;">
-                            <div style="color:#fff;font-size:11px;font-weight:800;line-height:1.2;">${App.escapeHtml(settings.schoolName)}</div>
-                            <div style="color:#d4a017;font-size:8px;font-weight:600;letter-spacing:0.5px;">STUDENT ID CARD</div>
-                        </div>
-                    </div>
-                    <div style="color:rgba(255,255,255,0.75);font-size:8px;">Session ${session}</div>
+            <div class="id-pair" style="display:inline-flex;gap:12px;margin:10px;vertical-align:top;page-break-inside:avoid;">
+              <div class="student-id-card" style="width:250px;height:400px;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(10,37,64,.18);position:relative;font-family:'Segoe UI',Arial,sans-serif;">
+                <div style="height:118px;background:#0a2540;position:relative;overflow:hidden;">
+                  <div style="position:absolute;right:-30px;bottom:-46px;width:130px;height:130px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:absolute;left:0;right:40px;bottom:-28px;height:56px;background:#fff;border-radius:0 80px 0 0;"></div>
+                  <div style="position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:16px 14px 0;">
+                    <div style="width:46px;height:46px;border-radius:50%;border:2px solid #e8a317;display:flex;align-items:center;justify-content:center;color:#e8a317;font-weight:800;font-size:11px;flex-shrink:0;">SMP</div>
+                    <div style="color:#fff;font-weight:800;font-size:13px;letter-spacing:.4px;line-height:1.2;text-transform:uppercase;">${App.escapeHtml(school)}</div>
+                  </div>
                 </div>
-                <div style="padding: 12px 14px 8px; text-align: center;">
-                    <div style="width: 110px; height: 130px; margin: 0 auto 10px; border: 3px solid #d4a017; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.12); background:#e2e8f0;">
-                        ${photoBlock}
-                    </div>
-                    <div style="font-size:15px;font-weight:800;color:#0a2540;line-height:1.2;margin-bottom:2px;">${App.escapeHtml(s.name)}</div>
-                    <div style="display:inline-block;background:#0a2540;color:#d4a017;font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:8px;">
-                        ${App.escapeHtml(s.className || '-')} · Sec ${App.escapeHtml(s.section || '-')} · Roll ${App.escapeHtml(s.rollNo || '-')}
-                    </div>
-                    <div style="text-align:left;font-size:10px;line-height:1.55;color:#1e293b;border-top:1px dashed #cbd5e1;padding-top:8px;">
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Father</span><span style="font-weight:700;text-align:right;">${App.escapeHtml(s.fatherName || '-')}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Adm No</span><span style="font-weight:700;">${App.escapeHtml(s.admissionNo || s.id)}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">D.O.B</span><span style="font-weight:700;">${s.dob ? App.formatDate(s.dob) : '-'}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Blood</span><span style="font-weight:700;">${s.bloodGroup || 'N/A'}</span></div>
-                    </div>
+                <div style="margin-top:-36px;position:relative;z-index:3;text-align:center;">
+                  <div style="width:108px;height:108px;margin:0 auto;border-radius:50%;padding:5px;background:#e8a317;box-shadow:0 4px 10px rgba(0,0,0,.15);">
+                    <div style="width:100%;height:100%;border-radius:50%;overflow:hidden;background:#0a2540;border:3px solid #fff;">${photoBlock}</div>
+                  </div>
                 </div>
-                <div style="position:absolute;bottom:0;left:0;right:0;background:#0a2540;color:#fff;padding:7px 10px;font-size:8px;text-align:center;">
-                    <div style="color:#d4a017;font-weight:700;margin-bottom:2px;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</div>
-                    <div><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03304886710')} &nbsp;|&nbsp; <i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</div>
+                <div style="text-align:center;padding:10px 16px 0;">
+                  <div style="font-size:16px;font-weight:800;color:#0a2540;text-transform:uppercase;letter-spacing:.3px;">${App.escapeHtml(s.name || '')}</div>
+                  <div style="color:#e8a317;font-size:11px;font-weight:800;letter-spacing:.6px;margin-top:3px;">SCHOOL YEAR: ${session}</div>
                 </div>
+                <div style="padding:12px 18px 0;font-size:11px;color:#0a2540;">
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Student ID #:</span><span>${adm}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Grade Level:</span><span>${grade}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Date of Birth:</span><span>${dob}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Father:</span><span>${App.escapeHtml(s.fatherName || '-')}</span></div>
+                </div>
+                <div style="position:absolute;right:14px;bottom:58px;">${idQrBlock(s.admissionNo || s.id)}</div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:52px;background:#0a2540;overflow:hidden;">
+                  <div style="position:absolute;left:-20px;top:-28px;width:140px;height:70px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:absolute;right:30px;top:-36px;width:90px;height:70px;background:#e8a317;border-radius:50%;"></div>
+                </div>
+              </div>
+              <div class="student-id-card" style="width:250px;height:400px;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(10,37,64,.18);position:relative;font-family:'Segoe UI',Arial,sans-serif;">
+                <div style="height:132px;background:#0a2540;position:relative;overflow:hidden;padding:14px 16px;color:#fff;">
+                  <div style="position:absolute;right:-40px;bottom:-50px;width:150px;height:120px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:relative;z-index:2;">
+                    <div style="color:#e8a317;font-size:11px;font-weight:800;">Instructions:</div>
+                    <div style="font-size:9px;line-height:1.35;margin-top:3px;">This card is the property of ${App.escapeHtml(school)}. If found, please return it to the main office.</div>
+                    <div style="color:#e8a317;font-size:11px;font-weight:800;margin-top:8px;">Valid Dates:</div>
+                    <div style="font-size:9px;">Valid for the ${session} school year.</div>
+                  </div>
+                </div>
+                <div style="padding:16px 16px 8px;font-size:11px;color:#0a2540;">
+                  <div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Phone:</span><span>${App.escapeHtml(settings.phone || '03304886710')}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">WhatsApp:</span><span>${App.escapeHtml(settings.whatsapp || '03304886710')}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Email:</span><span style="text-align:right;">${App.escapeHtml(settings.email || 'info@thesmartmodern.edu.pk')}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Address:</span><span style="text-align:right;max-width:130px;">${App.escapeHtml(settings.address || 'Pakistan')}</span></div>
+                </div>
+                <div style="padding:10px 16px 0;">${idBarcode(s.admissionNo || s.id)}</div>
+                <div style="text-align:center;font-size:9px;letter-spacing:2px;color:#111;margin-top:2px;">${adm}</div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:88px;background:#0a2540;overflow:hidden;">
+                  <div style="position:absolute;left:-30px;top:-40px;width:160px;height:90px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:absolute;right:-20px;top:-36px;width:120px;height:80px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;height:100%;padding-top:18px;">
+                    <div style="width:36px;height:36px;border-radius:50%;border:2px solid #e8a317;color:#e8a317;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">SMP</div>
+                    <div style="color:#fff;font-weight:800;font-size:11px;text-transform:uppercase;max-width:150px;line-height:1.2;">${App.escapeHtml(school)}</div>
+                  </div>
+                </div>
+              </div>
             </div>`;
         }
 
@@ -1404,58 +1443,71 @@
 
         function buildTeacherIDCardHTML(t, settings) {
             const session = settings.academicSession || '2025-2026';
+            const school = settings.schoolName || 'The Smart Modern Public School';
             const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '-');
             const classes = Array.isArray(t.classes) ? t.classes.join(', ') : (t.classes || '-');
             const photoBlock = t.photo
                 ? `<img src="${t.photo}" alt="Photo" style="width:100%;height:100%;object-fit:cover;display:block;">`
-                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0a2540,#d4a017);color:#fff;font-size:42px;"><i class="fas fa-chalkboard-teacher"></i></div>`;
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0a2540;color:#d4a017;font-size:40px;"><i class="fas fa-chalkboard-teacher"></i></div>`;
             return `
-            <div class="student-id-card teacher-id-card" style="
-                width: 240px;
-                height: 380px;
-                background: #fff;
-                border: 3px solid #0a2540;
-                border-radius: 14px;
-                overflow: hidden;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-                position: relative;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                page-break-inside: avoid;
-                display: inline-block;
-                margin: 8px;
-                vertical-align: top;
-            ">
-                <div style="background: linear-gradient(135deg,#0a2540 0%,#1a3a5c 100%); padding: 12px 10px 10px; text-align: center; position: relative;">
-                    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#d4a017,#f5d76e,#d4a017);"></div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
-                        <div style="width:32px;height:32px;border-radius:50%;background:#d4a017;display:flex;align-items:center;justify-content:center;color:#0a2540;font-weight:800;font-size:11px;border:2px solid #fff;">SMP</div>
-                        <div style="text-align:left;max-width:170px;">
-                            <div style="color:#fff;font-size:11px;font-weight:800;line-height:1.2;">${App.escapeHtml(settings.schoolName)}</div>
-                            <div style="color:#d4a017;font-size:8px;font-weight:600;letter-spacing:0.5px;">STAFF / TEACHER ID CARD</div>
-                        </div>
-                    </div>
-                    <div style="color:rgba(255,255,255,0.75);font-size:8px;">Session ${session}</div>
+            <div class="id-pair" style="display:inline-flex;gap:12px;margin:10px;vertical-align:top;page-break-inside:avoid;">
+              <div class="teacher-id-card" style="width:250px;height:400px;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(10,37,64,.18);position:relative;font-family:'Segoe UI',Arial,sans-serif;">
+                <div style="height:118px;background:#0a2540;position:relative;overflow:hidden;">
+                  <div style="position:absolute;right:-30px;bottom:-46px;width:130px;height:130px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:absolute;left:0;right:40px;bottom:-28px;height:56px;background:#fff;border-radius:0 80px 0 0;"></div>
+                  <div style="position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:16px 14px 0;">
+                    <div style="width:46px;height:46px;border-radius:50%;border:2px solid #e8a317;display:flex;align-items:center;justify-content:center;color:#e8a317;font-weight:800;font-size:11px;">SMP</div>
+                    <div style="color:#fff;font-weight:800;font-size:13px;line-height:1.2;text-transform:uppercase;">${App.escapeHtml(school)}</div>
+                  </div>
                 </div>
-                <div style="padding: 12px 14px 8px; text-align: center;">
-                    <div style="width: 110px; height: 130px; margin: 0 auto 10px; border: 3px solid #d4a017; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.12); background:#e2e8f0;">
-                        ${photoBlock}
-                    </div>
-                    <div style="font-size:15px;font-weight:800;color:#0a2540;line-height:1.2;margin-bottom:2px;">${App.escapeHtml(t.name)}</div>
-                    <div style="display:inline-block;background:#d4a017;color:#0a2540;font-size:9px;font-weight:800;padding:2px 12px;border-radius:20px;margin-bottom:8px;">
-                        TEACHER
-                    </div>
-                    <div style="text-align:left;font-size:10px;line-height:1.55;color:#1e293b;border-top:1px dashed #cbd5e1;padding-top:8px;">
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Staff ID</span><span style="font-weight:700;">${App.escapeHtml(t.id)}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Subjects</span><span style="font-weight:700;text-align:right;max-width:130px;">${App.escapeHtml(subjects)}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Classes</span><span style="font-weight:700;text-align:right;max-width:130px;">${App.escapeHtml(classes)}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Phone</span><span style="font-weight:700;">${App.escapeHtml(t.phone || '-')}</span></div>
-                        <div style="display:flex;justify-content:space-between;gap:6px;"><span style="color:#64748b;font-weight:600;">Joining</span><span style="font-weight:700;">${t.joiningDate ? App.formatDate(t.joiningDate) : '-'}</span></div>
-                    </div>
+                <div style="margin-top:-36px;position:relative;z-index:3;text-align:center;">
+                  <div style="width:108px;height:108px;margin:0 auto;border-radius:50%;padding:5px;background:#e8a317;">
+                    <div style="width:100%;height:100%;border-radius:50%;overflow:hidden;background:#0a2540;border:3px solid #fff;">${photoBlock}</div>
+                  </div>
                 </div>
-                <div style="position:absolute;bottom:0;left:0;right:0;background:#0a2540;color:#fff;padding:7px 10px;font-size:8px;text-align:center;">
-                    <div style="color:#d4a017;font-weight:700;margin-bottom:2px;">${App.escapeHtml(settings.tagline || 'Quality Education, Bright Future')}</div>
-                    <div><i class="fab fa-whatsapp" style="color:#25d366;"></i> ${App.escapeHtml(settings.whatsapp || '03304886710')} &nbsp;|&nbsp; <i class="fas fa-phone" style="color:#d4a017;"></i> ${App.escapeHtml(settings.phone || '03304886710')}</div>
+                <div style="text-align:center;padding:10px 16px 0;">
+                  <div style="font-size:16px;font-weight:800;color:#0a2540;text-transform:uppercase;">${App.escapeHtml(t.name || '')}</div>
+                  <div style="color:#e8a317;font-size:11px;font-weight:800;margin-top:3px;">TEACHER · ${session}</div>
                 </div>
+                <div style="padding:12px 18px 0;font-size:11px;color:#0a2540;">
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Staff ID:</span><span>${App.escapeHtml(t.id)}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Subjects:</span><span style="text-align:right;max-width:120px;">${App.escapeHtml(subjects)}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Classes:</span><span style="text-align:right;max-width:120px;">${App.escapeHtml(classes)}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Phone:</span><span>${App.escapeHtml(t.phone || '-')}</span></div>
+                </div>
+                <div style="position:absolute;right:14px;bottom:58px;">${idQrBlock(t.id)}</div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:52px;background:#0a2540;overflow:hidden;">
+                  <div style="position:absolute;left:-20px;top:-28px;width:140px;height:70px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:absolute;right:30px;top:-36px;width:90px;height:70px;background:#e8a317;border-radius:50%;"></div>
+                </div>
+              </div>
+              <div class="teacher-id-card" style="width:250px;height:400px;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(10,37,64,.18);position:relative;font-family:'Segoe UI',Arial,sans-serif;">
+                <div style="height:132px;background:#0a2540;position:relative;overflow:hidden;padding:14px 16px;color:#fff;">
+                  <div style="position:absolute;right:-40px;bottom:-50px;width:150px;height:120px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:relative;z-index:2;">
+                    <div style="color:#e8a317;font-size:11px;font-weight:800;">Instructions:</div>
+                    <div style="font-size:9px;line-height:1.35;margin-top:3px;">This staff card is the property of ${App.escapeHtml(school)}. If found, please return it to the main office.</div>
+                    <div style="color:#e8a317;font-size:11px;font-weight:800;margin-top:8px;">Valid Dates:</div>
+                    <div style="font-size:9px;">Valid for the ${session} school year.</div>
+                  </div>
+                </div>
+                <div style="padding:16px 16px 8px;font-size:11px;color:#0a2540;">
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Phone:</span><span>${App.escapeHtml(settings.phone || '03304886710')}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">WhatsApp:</span><span>${App.escapeHtml(settings.whatsapp || '03304886710')}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Email:</span><span>${App.escapeHtml(t.email || settings.email || '-')}</span></div>
+                  <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Joining:</span><span>${t.joiningDate ? App.formatDate(t.joiningDate) : '-'}</span></div>
+                </div>
+                <div style="padding:10px 16px 0;">${idBarcode(t.id)}</div>
+                <div style="text-align:center;font-size:9px;letter-spacing:2px;color:#111;margin-top:2px;">${App.escapeHtml(t.id)}</div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:88px;background:#0a2540;overflow:hidden;">
+                  <div style="position:absolute;left:-30px;top:-40px;width:160px;height:90px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:absolute;right:-20px;top:-36px;width:120px;height:80px;background:#e8a317;border-radius:50%;"></div>
+                  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;height:100%;padding-top:18px;">
+                    <div style="width:36px;height:36px;border-radius:50%;border:2px solid #e8a317;color:#e8a317;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">SMP</div>
+                    <div style="color:#fff;font-weight:800;font-size:11px;text-transform:uppercase;max-width:150px;">${App.escapeHtml(school)}</div>
+                  </div>
+                </div>
+              </div>
             </div>`;
         }
 
