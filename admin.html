@@ -624,7 +624,7 @@
                         <label>Student Photo (ID Card)</label>
                         <input type="file" id="s-photo-file" accept="image/*" onchange="previewStudentPhoto(this)">
                         <input type="hidden" id="s-photo">
-                        <small style="color:var(--text-secondary);">JPG/PNG, max ~500KB recommended</small>
+                        <small style="color:var(--text-secondary);">JPG/PNG — koi bhi size (auto compress)</small>
                     </div>
                     <div class="form-group" style="text-align:center;">
                         <div id="s-photo-preview" style="width:90px;height:110px;border:2px solid #d4a017;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;color:#94a3b8;">
@@ -1102,17 +1102,50 @@
                 box.innerHTML = '<i class="fas ' + (iconClass || 'fa-user') + '" style="font-size:28px;"></i>';
             }
         }
+        function compressPhotoFile(file, maxSide, quality) {
+            maxSide = maxSide || 700;
+            quality = quality || 0.82;
+            return new Promise(function(resolve, reject) {
+                const reader = new FileReader();
+                reader.onerror = function() { reject(new Error('read failed')); };
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let w = img.width, h = img.height;
+                        if (w > maxSide || h > maxSide) {
+                            if (w >= h) { h = Math.round(h * (maxSide / w)); w = maxSide; }
+                            else { w = Math.round(w * (maxSide / h)); h = maxSide; }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        if (dataUrl.length > 650000) dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = function() { reject(new Error('img fail')); };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
         function readPhotoFile(input, hiddenId, previewId, iconClass) {
             const file = input.files && input.files[0];
             if (!file) return;
-            if (file.size > 800000) { App.showToast('Photo too large. Use under 800KB', 'warning'); input.value = ''; return; }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
+            if (!file.type || !file.type.startsWith('image/')) {
+                App.showToast('Please select an image file', 'warning');
+                input.value = '';
+                return;
+            }
+            App.showToast('Uploading photo...', 'info');
+            compressPhotoFile(file, 700, 0.85).then(function(dataUrl) {
                 document.getElementById(hiddenId).value = dataUrl;
                 setPhotoPreview(previewId, dataUrl, iconClass);
-            };
-            reader.readAsDataURL(file);
+                App.showToast('Photo ready', 'success');
+            }).catch(function() {
+                App.showToast('Photo upload failed', 'error');
+                input.value = '';
+            });
         }
         function previewStudentPhoto(input) { readPhotoFile(input, 's-photo', 's-photo-preview', 'fa-user'); }
         function clearStudentPhoto() {
