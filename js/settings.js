@@ -10,22 +10,62 @@ function setPreviewImage(previewId, dataUrl, iconClass) {
     }
 }
 
+function compressImageFile(file, maxSide, quality) {
+    maxSide = maxSide || 800;
+    quality = quality || 0.82;
+    return new Promise(function (resolve, reject) {
+        const reader = new FileReader();
+        reader.onerror = function () { reject(new Error('read failed')); };
+        reader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+                let w = img.width;
+                let h = img.height;
+                if (w > maxSide || h > maxSide) {
+                    if (w >= h) {
+                        h = Math.round(h * (maxSide / w));
+                        w = maxSide;
+                    } else {
+                        w = Math.round(w * (maxSide / h));
+                        h = maxSide;
+                    }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                if (dataUrl.length > 700000) {
+                    dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+                }
+                resolve(dataUrl);
+            };
+            img.onerror = function () { reject(new Error('image load failed')); };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
 function readImageToHidden(input, hiddenId, previewId, iconClass) {
     const file = input.files && input.files[0];
     if (!file) return;
-    if (file.size > 900000) {
-        if (typeof App !== 'undefined') App.showToast('Image too large. Use under 900KB', 'warning');
+    if (!file.type || !file.type.startsWith('image/')) {
+        if (typeof App !== 'undefined') App.showToast('Please select an image file', 'warning');
         input.value = '';
         return;
     }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const dataUrl = e.target.result;
+    if (typeof App !== 'undefined') App.showToast('Uploading image...', 'info');
+    compressImageFile(file, 900, 0.85).then(function (dataUrl) {
         const hidden = document.getElementById(hiddenId);
         if (hidden) hidden.value = dataUrl;
         setPreviewImage(previewId, dataUrl, iconClass);
-    };
-    reader.readAsDataURL(file);
+        if (typeof App !== 'undefined') App.showToast('Image ready — Save Settings dabayein', 'success');
+    }).catch(function () {
+        if (typeof App !== 'undefined') App.showToast('Image upload failed', 'error');
+        input.value = '';
+    });
 }
 
 function previewLogo(input) {
