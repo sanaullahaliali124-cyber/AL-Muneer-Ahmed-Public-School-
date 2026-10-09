@@ -523,6 +523,42 @@
                             <div class="form-group"><label>Academic Session</label><input type="text" id="setting-academicSession"></div>
                         </div>
                         <div class="form-group"><label>Address</label><input type="text" id="setting-address"></div>
+
+                        <hr style="margin:24px 0;border:none;border-top:1px solid var(--border-color);">
+                        <h3 style="font-size:1rem;margin-bottom:14px;"><i class="fas fa-image"></i> School Logo &amp; Profile</h3>
+                        <div class="form-row" style="align-items:flex-start;gap:24px;flex-wrap:wrap;">
+                            <div class="form-group" style="min-width:200px;">
+                                <label>School Logo</label>
+                                <input type="file" id="setting-logo-file" accept="image/*" onchange="Settings.previewLogo(this)">
+                                <input type="hidden" id="setting-logo">
+                                <div style="margin-top:10px;display:flex;align-items:center;gap:12px;">
+                                    <div id="setting-logo-preview" style="width:72px;height:72px;border-radius:50%;border:2px solid #d4a017;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#94a3b8;">
+                                        <i class="fas fa-school" style="font-size:22px;"></i>
+                                    </div>
+                                    <div style="display:flex;flex-direction:column;gap:6px;">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('setting-logo-file').click()"><i class="fas fa-upload"></i> Change Logo</button>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="Settings.removeLogo()"><i class="fas fa-trash"></i> Remove Logo</button>
+                                    </div>
+                                </div>
+                                <small style="color:var(--text-secondary);display:block;margin-top:6px;">PNG/JPG recommended. Sidebar + ID cards pe use hoga.</small>
+                            </div>
+                            <div class="form-group" style="min-width:200px;">
+                                <label>Admin Profile Photo</label>
+                                <input type="file" id="setting-profile-file" accept="image/*" onchange="Settings.previewProfile(this)">
+                                <input type="hidden" id="setting-profilePhoto">
+                                <div style="margin-top:10px;display:flex;align-items:center;gap:12px;">
+                                    <div id="setting-profile-preview" style="width:72px;height:72px;border-radius:50%;border:2px solid #0a2540;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#94a3b8;">
+                                        <i class="fas fa-user" style="font-size:22px;"></i>
+                                    </div>
+                                    <div style="display:flex;flex-direction:column;gap:6px;">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('setting-profile-file').click()"><i class="fas fa-upload"></i> Change Profile</button>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="Settings.removeProfile()"><i class="fas fa-trash"></i> Remove Profile</button>
+                                    </div>
+                                </div>
+                                <small style="color:var(--text-secondary);display:block;margin-top:6px;">Sidebar neeche admin avatar pe dikhega.</small>
+                            </div>
+                        </div>
+
                         <hr style="margin:24px 0;border:none;border-top:1px solid var(--border-color);">
                         <h3 style="font-size:1rem;margin-bottom:12px;"><i class="fas fa-bars"></i> Menu Display</h3>
                         <div class="form-row">
@@ -1295,27 +1331,61 @@
                 `<option value="${s.id}">${s.name} - ${s.className} (${s.section})</option>`
             ).join('');
         }
-        function idBarcode(code) {
-            const src = String(code || '00000000');
-            let bars = '';
-            for (let i = 0; i < src.length; i++) {
-                const n = src.charCodeAt(i);
-                const w = 1 + (n % 3);
-                bars += `<span style="display:inline-block;width:${w}px;height:36px;background:#111;margin-right:1px;"></span>`;
-                bars += `<span style="display:inline-block;width:1px;height:36px;background:#fff;"></span>`;
-            }
-            return `<div style="display:flex;align-items:flex-end;justify-content:center;height:40px;background:#fff;padding:2px 8px;">${bars}</div>`;
+        // Real scannable QR (phone camera readable)
+        function idQrBlock(dataText) {
+            const data = encodeURIComponent(String(dataText || 'SMP'));
+            const url = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&margin=1&ecc=M&data=' + data;
+            return `<img src="${url}" alt="QR Code" width="52" height="52" style="display:block;background:#fff;border:1px solid #e2e8f0;padding:2px;border-radius:3px;" loading="lazy">`;
         }
-        function idQrBlock(code) {
-            const src = String(code || 'SMP');
-            let cells = '';
-            for (let r = 0; r < 7; r++) {
-                for (let c = 0; c < 7; c++) {
-                    const on = ((src.charCodeAt((r + c) % src.length) + r * 3 + c) % 3) !== 0 || (r < 2 && c < 2) || (r < 2 && c > 4) || (r > 4 && c < 2);
-                    cells += `<span style="width:4px;height:4px;background:${on ? '#111' : '#fff'};display:block;"></span>`;
-                }
+        // Real Code128 barcode (scanner readable)
+        function idBarcode(code) {
+            const data = encodeURIComponent(String(code || '00000000'));
+            const url = 'https://barcodeapi.org/api/128/' + data;
+            return `<div style="background:#fff;padding:4px 8px;text-align:center;">
+                <img src="${url}" alt="Barcode" style="height:42px;max-width:210px;width:100%;object-fit:contain;display:block;margin:0 auto;" loading="lazy"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                <div style="display:none;font-family:monospace;letter-spacing:2px;font-size:12px;font-weight:700;">${String(code || '').replace(/</g,'')}</div>
+            </div>`;
+        }
+        function buildStudentQRData(s, settings) {
+            const school = settings.schoolName || 'The Smart Modern Public School';
+            const lines = [
+                school,
+                'STUDENT ID CARD',
+                'Name: ' + (s.name || ''),
+                'ID: ' + (s.admissionNo || s.id || ''),
+                'Class: ' + (s.className || '') + (s.section ? '-' + s.section : ''),
+                'Roll: ' + (s.rollNo || '-'),
+                'Father: ' + (s.fatherName || '-'),
+                'DOB: ' + (s.dob || '-'),
+                'WhatsApp: ' + (settings.whatsapp || '03304886710'),
+                'Phone: ' + (settings.phone || '03304886710')
+            ];
+            return lines.join('\n');
+        }
+        function buildTeacherQRData(t, settings) {
+            const school = settings.schoolName || 'The Smart Modern Public School';
+            const subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '-');
+            const lines = [
+                school,
+                'TEACHER ID CARD',
+                'Name: ' + (t.name || ''),
+                'Staff ID: ' + (t.id || ''),
+                'Subjects: ' + subjects,
+                'Phone: ' + (t.phone || '-'),
+                'WhatsApp: ' + (t.whatsapp || settings.whatsapp || '03304886710'),
+                'School WA: ' + (settings.whatsapp || '03304886710')
+            ];
+            return lines.join('\n');
+        }
+
+        function schoolLogoBadge(settings, size) {
+            size = size || 46;
+            const logo = settings && settings.logo;
+            if (logo && String(logo).startsWith('data:')) {
+                return `<img src="${logo}" alt="Logo" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:2px solid #e8a317;background:#fff;flex-shrink:0;">`;
             }
-            return `<div style="width:42px;height:42px;display:grid;grid-template-columns:repeat(7,4px);gap:1px;background:#fff;border:1px solid #e2e8f0;padding:2px;">${cells}</div>`;
+            return `<div style="width:${size}px;height:${size}px;border-radius:50%;border:2px solid #e8a317;display:flex;align-items:center;justify-content:center;color:#e8a317;font-weight:800;font-size:${Math.round(size*0.24)}px;flex-shrink:0;">SMP</div>`;
         }
 
         function buildStudentIDCardHTML(s, settings) {
@@ -1334,7 +1404,7 @@
                   <div style="position:absolute;right:-30px;bottom:-46px;width:130px;height:130px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:absolute;left:0;right:40px;bottom:-28px;height:56px;background:#fff;border-radius:0 80px 0 0;"></div>
                   <div style="position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:16px 14px 0;">
-                    <div style="width:46px;height:46px;border-radius:50%;border:2px solid #e8a317;display:flex;align-items:center;justify-content:center;color:#e8a317;font-weight:800;font-size:11px;flex-shrink:0;">SMP</div>
+                    ${schoolLogoBadge(settings, 46)}
                     <div style="color:#fff;font-weight:800;font-size:13px;letter-spacing:.4px;line-height:1.2;text-transform:uppercase;">${App.escapeHtml(school)}</div>
                   </div>
                 </div>
@@ -1353,7 +1423,7 @@
                   <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Date of Birth:</span><span>${dob}</span></div>
                   <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Father:</span><span>${App.escapeHtml(s.fatherName || '-')}</span></div>
                 </div>
-                <div style="position:absolute;right:14px;bottom:58px;">${idQrBlock(s.admissionNo || s.id)}</div>
+                <div style="position:absolute;right:14px;bottom:58px;">${idQrBlock(buildStudentQRData(s, settings))}</div>
                 <div style="position:absolute;left:0;right:0;bottom:0;height:52px;background:#0a2540;overflow:hidden;">
                   <div style="position:absolute;left:-20px;top:-28px;width:140px;height:70px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:absolute;right:30px;top:-36px;width:90px;height:70px;background:#e8a317;border-radius:50%;"></div>
@@ -1375,13 +1445,13 @@
                   <div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Email:</span><span style="text-align:right;">${App.escapeHtml(settings.email || 'info@thesmartmodern.edu.pk')}</span></div>
                   <div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Address:</span><span style="text-align:right;max-width:130px;">${App.escapeHtml(settings.address || 'Pakistan')}</span></div>
                 </div>
-                <div style="padding:10px 16px 0;">${idBarcode(s.admissionNo || s.id)}</div>
-                <div style="text-align:center;font-size:9px;letter-spacing:2px;color:#111;margin-top:2px;">${adm}</div>
+                <div style="padding:10px 16px 0;">${idBarcode(s.admissionNo || s.id || 'SMP000')}</div>
+                <div style="text-align:center;font-size:9px;letter-spacing:2px;color:#111;margin-top:2px;font-weight:700;">${adm}</div>
                 <div style="position:absolute;left:0;right:0;bottom:0;height:88px;background:#0a2540;overflow:hidden;">
                   <div style="position:absolute;left:-30px;top:-40px;width:160px;height:90px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:absolute;right:-20px;top:-36px;width:120px;height:80px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;height:100%;padding-top:18px;">
-                    <div style="width:36px;height:36px;border-radius:50%;border:2px solid #e8a317;color:#e8a317;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">SMP</div>
+                    ${schoolLogoBadge(settings, 36)}
                     <div style="color:#fff;font-weight:800;font-size:11px;text-transform:uppercase;max-width:150px;line-height:1.2;">${App.escapeHtml(school)}</div>
                   </div>
                 </div>
@@ -1456,7 +1526,7 @@
                   <div style="position:absolute;right:-30px;bottom:-46px;width:130px;height:130px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:absolute;left:0;right:40px;bottom:-28px;height:56px;background:#fff;border-radius:0 80px 0 0;"></div>
                   <div style="position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:16px 14px 0;">
-                    <div style="width:46px;height:46px;border-radius:50%;border:2px solid #e8a317;display:flex;align-items:center;justify-content:center;color:#e8a317;font-weight:800;font-size:11px;">SMP</div>
+                    ${schoolLogoBadge(settings, 46)}
                     <div style="color:#fff;font-weight:800;font-size:13px;line-height:1.2;text-transform:uppercase;">${App.escapeHtml(school)}</div>
                   </div>
                 </div>
@@ -1475,7 +1545,7 @@
                   <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Classes:</span><span style="text-align:right;max-width:120px;">${App.escapeHtml(classes)}</span></div>
                   <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:5px 0;"><span style="font-weight:700;">Phone:</span><span>${App.escapeHtml(t.phone || '-')}</span></div>
                 </div>
-                <div style="position:absolute;right:14px;bottom:58px;">${idQrBlock(t.id)}</div>
+                <div style="position:absolute;right:14px;bottom:58px;">${idQrBlock(buildTeacherQRData(t, settings))}</div>
                 <div style="position:absolute;left:0;right:0;bottom:0;height:52px;background:#0a2540;overflow:hidden;">
                   <div style="position:absolute;left:-20px;top:-28px;width:140px;height:70px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:absolute;right:30px;top:-36px;width:90px;height:70px;background:#e8a317;border-radius:50%;"></div>
@@ -1497,13 +1567,13 @@
                   <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Email:</span><span>${App.escapeHtml(t.email || settings.email || '-')}</span></div>
                   <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #e8a317;padding:7px 0;"><span style="font-weight:700;">Joining:</span><span>${t.joiningDate ? App.formatDate(t.joiningDate) : '-'}</span></div>
                 </div>
-                <div style="padding:10px 16px 0;">${idBarcode(t.id)}</div>
-                <div style="text-align:center;font-size:9px;letter-spacing:2px;color:#111;margin-top:2px;">${App.escapeHtml(t.id)}</div>
+                <div style="padding:10px 16px 0;">${idBarcode(t.id || 'TCH000')}</div>
+                <div style="text-align:center;font-size:9px;letter-spacing:2px;color:#111;margin-top:2px;font-weight:700;">${App.escapeHtml(t.id)}</div>
                 <div style="position:absolute;left:0;right:0;bottom:0;height:88px;background:#0a2540;overflow:hidden;">
                   <div style="position:absolute;left:-30px;top:-40px;width:160px;height:90px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:absolute;right:-20px;top:-36px;width:120px;height:80px;background:#e8a317;border-radius:50%;"></div>
                   <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;height:100%;padding-top:18px;">
-                    <div style="width:36px;height:36px;border-radius:50%;border:2px solid #e8a317;color:#e8a317;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">SMP</div>
+                    ${schoolLogoBadge(settings, 36)}
                     <div style="color:#fff;font-weight:800;font-size:11px;text-transform:uppercase;max-width:150px;">${App.escapeHtml(school)}</div>
                   </div>
                 </div>
