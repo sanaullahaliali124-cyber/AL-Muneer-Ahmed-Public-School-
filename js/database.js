@@ -113,6 +113,7 @@ function getDefaultSettings() {
         email: 'info@thesmartmodern.edu.pk',
         address: 'Pakistan',
         logo: 'assets/logo.png',
+        profilePhoto: '',
         academicSession: '2025-2026',
         theme: 'light',
         feeStructure: {
